@@ -5,7 +5,7 @@ public class Okno extends JFrame {
 
 	Rozgrywka rozgrywka;
 	Serwer serwer;
-	
+
 	private Okno() throws Exception {
 
 		super("Snake8");
@@ -13,15 +13,14 @@ public class Okno extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setLocationRelativeTo(null);
-		
-		serwer = new Serwer(this, 100, 50, 1);
+
+		serwer = new Serwer(this, 20, 10, 1);
 		Thread thread = new Thread(() -> {
 
-	    });
-	    thread.start();
+		});
+		thread.start();
 		rozgrywka = new Rozgrywka(serwer, this);
 		this.add(rozgrywka);
-
 	}
 
 	public static void main(String[] args) throws Exception {
