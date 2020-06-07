@@ -1,27 +1,30 @@
 import javax.swing.JFrame;
+import javax.swing.JPanel;
 
-public class Okno extends JFrame{
+public class Okno extends JFrame {
+
+	Rozgrywka rozgrywka;
+	Serwer serwer;
 	
-	char[][] mapa;
-	int wysokoscMapy=50;
-	int szerokoscMapy=100;
-	
-	private Okno()  throws Exception{
-		
+	private Okno() throws Exception {
+
 		super("Snake8");
 		setSize(1286, 743);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setLocationRelativeTo(null);
 		
-		mapa = new char[wysokoscMapy][szerokoscMapy];
-		
-		Rozgrywka rozgrywka = new Rozgrywka(this);
-		add(rozgrywka);
+		serwer = new Serwer(this, 100, 50, 1);
+		Thread thread = new Thread(() -> {
+
+	    });
+	    thread.start();
+		rozgrywka = new Rozgrywka(serwer, this);
+		this.add(rozgrywka);
 
 	}
-	
-	public static void main(String[] args)  throws Exception{
+
+	public static void main(String[] args) throws Exception {
 		new Okno();
 	}
 
