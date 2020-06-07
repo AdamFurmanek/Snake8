@@ -14,7 +14,7 @@ public class Okno extends JFrame {
 		setVisible(true);
 		setLocationRelativeTo(null);
 
-		serwer = new Serwer(this, 20, 10, 1);
+		serwer = new Serwer(this, 50, 25, 2);
 		Thread thread = new Thread(() -> {
 
 		});

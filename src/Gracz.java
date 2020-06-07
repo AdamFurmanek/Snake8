@@ -16,7 +16,8 @@ public class Gracz {
 		// szuka swojej glowki
 		for (int i = 0; i < serwer.wysokoscMapy; i++)
 			for (int j = 0; j < serwer.szerokoscMapy; j++) {
-				if (serwer.mapa[i][j].charAt(0) == '1' && serwer.mapa[i][j].charAt(2) == '0') {
+				if (serwer.mapa[i][j].charAt(0) == Integer.toString(gracz).charAt(0)
+						&& serwer.mapa[i][j].charAt(2) == '0') {
 					y = i;
 					x = j;
 				}
@@ -32,10 +33,12 @@ public class Gracz {
 					|| x == 0 && serwer.kierunek[gracz - 1] == 'a'
 					|| y == serwer.wysokoscMapy - 1 && serwer.kierunek[gracz - 1] == 's'
 					|| y == 0 && serwer.kierunek[gracz - 1] == 'w'
-					|| y>0&&serwer.mapa[y - 1][x].charAt(0) != '0' && serwer.kierunek[gracz - 1] == 'w'
-					|| y<serwer.wysokoscMapy-1&&serwer.mapa[y + 1][x].charAt(0) != '0' && serwer.kierunek[gracz - 1] == 's'
-					|| x>0&&serwer.mapa[y][x - 1].charAt(0) != '0' && serwer.kierunek[gracz - 1] == 'a'
-					|| x<serwer.szerokoscMapy-1&&serwer.mapa[y][x + 1].charAt(0) != '0' && serwer.kierunek[gracz - 1] == 'd') {
+					|| y > 0 && serwer.mapa[y - 1][x].charAt(0) != '0' && serwer.kierunek[gracz - 1] == 'w'
+					|| y < serwer.wysokoscMapy - 1 && serwer.mapa[y + 1][x].charAt(0) != '0'
+							&& serwer.kierunek[gracz - 1] == 's'
+					|| x > 0 && serwer.mapa[y][x - 1].charAt(0) != '0' && serwer.kierunek[gracz - 1] == 'a'
+					|| x < serwer.szerokoscMapy - 1 && serwer.mapa[y][x + 1].charAt(0) != '0'
+							&& serwer.kierunek[gracz - 1] == 'd') {
 
 				if (false) { // jesli cialo ma zniknac
 					for (int i = 0; i < serwer.wysokoscMapy; i++)
@@ -49,8 +52,6 @@ public class Gracz {
 				serwer.okno.rozgrywka.repaint();
 				break;
 			}
-			System.out.println("Mam glowke na " + y + " " + x + ", a moj kierunek to " + serwer.kierunek[gracz - 1]);
-			System.out.println("komorka mapy: " + serwer.mapa[y][x]);
 
 			x2 = x;
 			y2 = y;
@@ -84,7 +85,6 @@ public class Gracz {
 				if (serwer.mapa[y3][x3].charAt(1) == '0') {
 					break;
 				}
-				// System.out.println("wspolrzedne " + y3 + " " + x3);
 			}
 
 			serwer.mapa[y3][x3] = new String("0");
