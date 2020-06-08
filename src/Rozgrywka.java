@@ -34,7 +34,7 @@ public class Rozgrywka {
 
 		while (true) {
 			try {
-				Thread.sleep(50);
+				Thread.sleep(20);
 			} catch (InterruptedException e) {
 			}
 			for (int i = 0; i < ileGraczy; i++) {
@@ -62,7 +62,7 @@ public class Rozgrywka {
 
 		waz = new Waz[ileGraczy];
 		for (int i = 0; i < ileGraczy; i++)
-			waz[i] = new Waz(this);
+			waz[i] = new Waz(this, 1,2);
 
 		for (int i = 0; i < ileGraczy; i++) {
 
@@ -80,6 +80,14 @@ public class Rozgrywka {
 
 			waz[i].cialoWeza.add(0, new int[2]);
 			waz[i].cialoWeza.get(0)[0] = 3;
+			waz[i].cialoWeza.get(0)[1] = i;
+			
+			waz[i].cialoWeza.add(0, new int[2]);
+			waz[i].cialoWeza.get(0)[0] = 4;
+			waz[i].cialoWeza.get(0)[1] = i;
+			
+			waz[i].cialoWeza.add(0, new int[2]);
+			waz[i].cialoWeza.get(0)[0] = 5;
 			waz[i].cialoWeza.get(0)[1] = i;
 
 		}

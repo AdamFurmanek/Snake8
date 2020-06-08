@@ -9,7 +9,7 @@ public class Okno extends JFrame {
 		setVisible(true);
 		setLocationRelativeTo(null);
 
-		Rozgrywka rozgrywka = new Rozgrywka(this, 20, 10, 2);
+		Rozgrywka rozgrywka = new Rozgrywka(this, 30, 15, 3);
 	}
 
 	public static void main(String[] args) throws Exception {
