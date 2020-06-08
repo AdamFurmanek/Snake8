@@ -62,7 +62,7 @@ public class Rozgrywka {
 
 		waz = new Waz[ileGraczy];
 		for (int i = 0; i < ileGraczy; i++)
-			waz[i] = new Waz(this, 1,2);
+			waz[i] = new Waz(this, i,1,2,true,true,true,true);
 
 		for (int i = 0; i < ileGraczy; i++) {
 
