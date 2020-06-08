@@ -1,118 +1,87 @@
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.geom.AffineTransform;
+import java.util.ArrayList;
+import java.util.List;
 
-import javax.swing.ImageIcon;
-import javax.swing.JPanel;
-
-public class Rozgrywka extends JPanel implements KeyListener {
+public class Rozgrywka {
 
 	Okno okno;
-	Serwer serwer;
+	Ekran ekran;
 
-	double skalaWysokoscOkno, skalaSzerokoscOkno;
-	double skalaWysokoscMapa, skalaSzerokoscMapa;
+	int ileGraczy;
+	int szerokoscMapy, wysokoscMapy;
+	char[][][] mapa;
+	Waz[] waz;
 
-	public Rozgrywka(Serwer serwer, Okno okno) throws Exception {
+	int[][] szybkoscWeza;
+	int[][] pozycjaWeza;
 
-		addKeyListener(this);
-		setFocusable(true);
+	public Rozgrywka(Okno okno, int szerokoscMapy, int wysokoscMapy, int ileGraczy) {
 
-		this.serwer = serwer;
 		this.okno = okno;
+		this.szerokoscMapy = szerokoscMapy;
+		this.wysokoscMapy = wysokoscMapy;
+		this.ileGraczy = ileGraczy;
 
-		this.addComponentListener(new ComponentAdapter() {
-			public void componentResized(ComponentEvent e) {
-				skalaSzerokoscOkno = (double) okno.getWidth() / 1920;
-				skalaWysokoscOkno = (double) okno.getHeight() / 1080;
-			}
-		});
-		skalaSzerokoscMapa = (double) 1720 / (serwer.szerokoscMapy * 200);
-		skalaWysokoscMapa = (double) 880 / (serwer.wysokoscMapy * 200);
+		ekran = new Ekran(this);
+		okno.add(ekran);
+
+		reset();
+
+		petlaGlowna();
+
 	}
 
-	@Override
-	public void paintComponent(Graphics g) {
+	void petlaGlowna() {
 
-		Graphics2D g2d = (Graphics2D) g.create();
-		new ImageIcon("images/tlo.png").paintIcon(this, g2d, 0, 0);
-		AffineTransform at = new AffineTransform();
-		at.scale(skalaSzerokoscOkno * skalaSzerokoscMapa, skalaWysokoscOkno * skalaWysokoscMapa);
-		g2d.setTransform(at);
-
-		for (int i = 0; i < serwer.wysokoscMapy; i++) {
-			for (int j = 0; j < serwer.szerokoscMapy; j++) {
-				new ImageIcon("images/0.png").paintIcon(this, g2d, (int) (94 / (skalaSzerokoscMapa) + j * 200),
-						(int) (77 / (skalaWysokoscMapa) + i * 200));
+		while (true) {
+			try {
+				Thread.sleep(50);
+			} catch (InterruptedException e) {
 			}
-		}
-
-		for (int i = 0; i < serwer.wysokoscMapy; i++) {
-			for (int j = 0; j < serwer.szerokoscMapy; j++) {
-				String sciezka = new String("images/");
-				sciezka += serwer.mapa[i][j].charAt(0);
-				if (serwer.mapa[i][j].charAt(0) != '0') {
-					sciezka = new String("images/1"); // TYMCZASOWO ZEBY WSZYSCY BYLI ZIELONI
-					if (serwer.mapa[i][j].charAt(1) == 'w' && serwer.mapa[i][j].charAt(2) == 'w'
-							|| serwer.mapa[i][j].charAt(1) == 's' && serwer.mapa[i][j].charAt(2) == 's')
-						sciezka += "pws";
-					else if (serwer.mapa[i][j].charAt(1) == 'a' && serwer.mapa[i][j].charAt(2) == 'a'
-							|| serwer.mapa[i][j].charAt(1) == 'd' && serwer.mapa[i][j].charAt(2) == 'd')
-						sciezka += "pad";
-					else if (serwer.mapa[i][j].charAt(1) == 's' && serwer.mapa[i][j].charAt(2) == 'a'
-							|| serwer.mapa[i][j].charAt(1) == 'd' && serwer.mapa[i][j].charAt(2) == 'w')
-						sciezka += "swa";
-					else if (serwer.mapa[i][j].charAt(1) == 's' && serwer.mapa[i][j].charAt(2) == 'd'
-							|| serwer.mapa[i][j].charAt(1) == 'a' && serwer.mapa[i][j].charAt(2) == 'w')
-						sciezka += "swd";
-					else if (serwer.mapa[i][j].charAt(1) == 'd' && serwer.mapa[i][j].charAt(2) == 's'
-							|| serwer.mapa[i][j].charAt(1) == 'w' && serwer.mapa[i][j].charAt(2) == 'a')
-						sciezka += "ssa";
-					else if (serwer.mapa[i][j].charAt(1) == 'w' && serwer.mapa[i][j].charAt(2) == 'd'
-							|| serwer.mapa[i][j].charAt(1) == 'a' && serwer.mapa[i][j].charAt(2) == 's')
-						sciezka += "ssd";
-					else if (serwer.mapa[i][j].charAt(2) == '0') {
-						if (serwer.mapa[i][j].charAt(1) == 'w')
-							sciezka += "gw";
-						else if (serwer.mapa[i][j].charAt(1) == 'a')
-							sciezka += "ga";
-						else if (serwer.mapa[i][j].charAt(1) == 's')
-							sciezka += "gs";
-						else if (serwer.mapa[i][j].charAt(1) == 'd')
-							sciezka += "gd";
-					} else if (serwer.mapa[i][j].charAt(1) == '0') {
-						if (serwer.mapa[i][j].charAt(2) == 'w')
-							sciezka += "ow";
-						else if (serwer.mapa[i][j].charAt(2) == 'a')
-							sciezka += "oa";
-						else if (serwer.mapa[i][j].charAt(2) == 's')
-							sciezka += "os";
-						else if (serwer.mapa[i][j].charAt(2) == 'd')
-							sciezka += "od";
-					} else
-						sciezka += "ga";
+			for (int i = 0; i < ileGraczy; i++) {
+				waz[i].szybkoscWeza[1]++;
+				if (waz[i].szybkoscWeza[0] <= waz[i].szybkoscWeza[1]) {
+					waz[i].szybkoscWeza[1] = 0;
+					waz[i].zrobKrok();
 				}
-				sciezka += ".png";
-				new ImageIcon(sciezka).paintIcon(this, g2d, (int) (94 / (skalaSzerokoscMapa) + j * 200),
-						(int) (77 / (skalaWysokoscMapa) + i * 200));
 			}
+			ekran.repaint();
 		}
 	}
 
-	public void keyTyped(KeyEvent e) {
-	}
+	void reset() {
 
-	public void keyPressed(KeyEvent e) {
+		mapa = new char[wysokoscMapy][szerokoscMapy][3];
 
-		serwer.steruj(e.getKeyChar());
-	}
+		for (int i = 0; i < wysokoscMapy; i++) {
+			for (int j = 0; j < szerokoscMapy; j++) {
+				mapa[i][j][0] = '0';
+				mapa[i][j][1] = '0';
+				mapa[i][j][2] = '0';
+			}
+		}
 
-	public void keyReleased(KeyEvent e) {
-		System.out.println(e.getKeyCode());
-		System.out.println(e.getKeyChar());
+		waz = new Waz[ileGraczy];
+		for (int i = 0; i < ileGraczy; i++)
+			waz[i] = new Waz(this);
+
+		for (int i = 0; i < ileGraczy; i++) {
+
+			waz[i].cialoWeza.add(0, new int[2]);
+			waz[i].cialoWeza.get(0)[0] = 0;
+			waz[i].cialoWeza.get(0)[1] = i;
+
+			waz[i].cialoWeza.add(0, new int[2]);
+			waz[i].cialoWeza.get(0)[0] = 1;
+			waz[i].cialoWeza.get(0)[1] = i;
+
+			waz[i].cialoWeza.add(0, new int[2]);
+			waz[i].cialoWeza.get(0)[0] = 2;
+			waz[i].cialoWeza.get(0)[1] = i;
+
+			waz[i].cialoWeza.add(0, new int[2]);
+			waz[i].cialoWeza.get(0)[0] = 3;
+			waz[i].cialoWeza.get(0)[1] = i;
+
+		}
 	}
 }

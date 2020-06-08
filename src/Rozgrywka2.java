@@ -1,20 +1,20 @@
 import java.awt.event.KeyEvent;
 
-public class Serwer {
+public class Rozgrywka2 {
 
-	Okno okno;
-	Rozgrywka rozgrywka;
+	Okno2 okno;
+	Wyswietlacz2 rozgrywka;
 
 	String[][] mapa;
 	int szerokoscMapy;
 	int wysokoscMapy;
 	int ileGraczy;
-	char klawisze[][] = { { 'w', 'a', 's', 'd' }, { 't','f','g','h' }, { 'j', 'k', 'k', 'l' },
+	char klawisze[][] = { { 'w', 'a', 's', 'd' }, { 't', 'f', 'g', 'h' }, { 'j', 'k', 'k', 'l' },
 			{ '5', '1', '2', '3' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' },
 			{ 'x', 'x', 'x', 'x' } };
 	char[] kierunek;
 
-	public Serwer(Okno okno, int szerokoscMapy, int wysokoscMapy, int ileGraczy) throws Exception {
+	public Rozgrywka2(Okno2 okno, int szerokoscMapy, int wysokoscMapy, int ileGraczy) throws Exception {
 
 		this.ileGraczy = ileGraczy;
 		kierunek = new char[ileGraczy];
@@ -33,7 +33,7 @@ public class Serwer {
 	void nowyGracz(int i) {
 
 		Thread thread = new Thread(() -> {
-			new Gracz(this, i);
+			new Gracz2(this, i);
 		});
 		thread.start();
 	}
@@ -47,7 +47,7 @@ public class Serwer {
 		mapa[5][7] = new String("1sd");
 		mapa[5][8] = new String("1ds");
 		mapa[6][8] = new String("1s0");
-		
+
 		mapa[10][13] = new String("20s");
 		mapa[11][13] = new String("2sd");
 		mapa[11][14] = new String("2ds");
@@ -66,10 +66,10 @@ public class Serwer {
 									&& mapa[k][l].charAt(2) == '0') {
 								System.out.println(k + " " + l);
 
-								if (!(j==2&&mapa[k][l].charAt(1)==klawisze[0][0]
-										|| j==0&&mapa[k][l].charAt(1)==klawisze[0][2]
-										|| j==1&&mapa[k][l].charAt(1)==klawisze[0][3]
-										|| j==3&&mapa[k][l].charAt(1)==klawisze[0][1])) {
+								if (!(j == 2 && mapa[k][l].charAt(1) == klawisze[0][0]
+										|| j == 0 && mapa[k][l].charAt(1) == klawisze[0][2]
+										|| j == 1 && mapa[k][l].charAt(1) == klawisze[0][3]
+										|| j == 3 && mapa[k][l].charAt(1) == klawisze[0][1])) {
 
 									kierunek[i] = klawisze[0][j];
 									System.out.println(znak + " " + i);

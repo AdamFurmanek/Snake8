@@ -1,14 +1,14 @@
 
-public class Gracz {
+public class Gracz2 {
 
-	Serwer serwer;
+	Rozgrywka2 serwer;
 	int gracz;
 	int x, y;
 	int x2, y2;
 	int x3, y3;
 	public char kierunek;
 
-	Gracz(Serwer serwer, int gracz) {
+	Gracz2(Rozgrywka2 serwer, int gracz) {
 		gracz++;
 		this.gracz = gracz;
 		this.serwer = serwer;
@@ -49,7 +49,7 @@ public class Gracz {
 						}
 				}
 
-				serwer.okno.rozgrywka.repaint();
+				serwer.okno.wyswietlacz.repaint();
 				break;
 			}
 
@@ -90,7 +90,7 @@ public class Gracz {
 			serwer.mapa[y3][x3] = new String("0");
 			serwer.mapa[y2][x2] = new String("" + serwer.mapa[y2][x2].charAt(0) + '0' + serwer.mapa[y2][x2].charAt(2));
 
-			serwer.okno.rozgrywka.repaint();
+			serwer.okno.wyswietlacz.repaint();
 
 		}
 	}
