@@ -1,3 +1,5 @@
+import java.awt.Color;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.event.ComponentAdapter;
@@ -10,8 +12,6 @@ import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 
 public class Ekran extends JPanel implements KeyListener {
-
-	
 	
 	Rozgrywka rozgrywka;
 
@@ -22,6 +22,8 @@ public class Ekran extends JPanel implements KeyListener {
 			{ '5', '1', '2', '3' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' },
 			{ 'x', 'x', 'x', 'x' } };
 
+	Font font;
+	
 	public Ekran(Rozgrywka rozgrywka) {
 		
 		this.rozgrywka = rozgrywka;
@@ -34,7 +36,9 @@ public class Ekran extends JPanel implements KeyListener {
 		});
 
 		skalaSzerokoscMapa = (double) 1720 / (rozgrywka.szerokoscMapy * 200);
-		skalaWysokoscMapa = (double) 880 / (rozgrywka.wysokoscMapy * 200);
+		skalaWysokoscMapa = (double) 680 / (rozgrywka.wysokoscMapy * 200);
+		
+		font = new Font("Gill Sans Ultra Bold", Font.BOLD, 72);
 		
 		addKeyListener(this);
 		setFocusable(true);
@@ -45,11 +49,28 @@ public class Ekran extends JPanel implements KeyListener {
 	public void paintComponent(Graphics g) {
 
 		Graphics2D g2d = (Graphics2D) g.create();
-		new ImageIcon("images/tlo.png").paintIcon(this, g2d, 0, 0);
 		AffineTransform at = new AffineTransform();
-		at.scale(skalaSzerokoscOkno * skalaSzerokoscMapa, skalaWysokoscOkno * skalaWysokoscMapa);
+		at.scale(skalaSzerokoscOkno,skalaWysokoscOkno);
 		g2d.setTransform(at);
+		new ImageIcon("images/tlo2.png").paintIcon(this, g2d, 0, 0);
+		new ImageIcon("images/00.png").paintIcon(this, g2d, 99, 820);
+		
 
+		
+		at.scale(skalaSzerokoscMapa,skalaWysokoscMapa);
+		g2d.setTransform(at);
+		
+		g2d.setFont(font);
+		for(int i=0;i<rozgrywka.ileGraczy;i++) {
+				new ImageIcon("images/"+(rozgrywka.waz[i].kolorWeza)+"gw.png").paintIcon(this, g2d, 1100+i*450, 2440);
+					g2d.setColor(Color.BLACK);
+					g2d.drawString(rozgrywka.waz[i].hp+"", 1100+i*450, 2680);
+					g2d.setColor(Color.GREEN);
+					g2d.drawString(rozgrywka.waz[i].punkty+"", 1080+i*450, 2510);
+					g2d.setColor(Color.RED);
+					g2d.drawString(rozgrywka.waz[i].smierci+"", 1250+i*450, 2510);
+		}
+		
 		for (int i = 0; i < rozgrywka.wysokoscMapy; i++) {
 			for (int j = 0; j < rozgrywka.szerokoscMapy; j++) {
 				new ImageIcon("images/0.png").paintIcon(this, g2d, (int) (94 / (skalaSzerokoscMapa) + j * 200),

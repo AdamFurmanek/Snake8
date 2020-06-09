@@ -15,6 +15,10 @@ public class Waz {
 	int kolorWeza;
 	int reakcjaNaSciane; //0-umiera,1-odbija sie,2-przenika
 	Rozgrywka rozgrywka;
+	int punkty = 0;
+	int smierci = 0;
+	int hp=100;
+	
 	
 
 	public Waz(Rozgrywka rozgrywka,int numerWeza, int kolorWeza, int reakcjaNaSciane, boolean czyWazZostawiaCialo, boolean czyWazPrzenikaInnych, boolean czyWazPrzenikaSiebie, boolean czyWazMozeCofnac) {
@@ -29,7 +33,7 @@ public class Waz {
 		this.kolorWeza=kolorWeza;
 		this.rozgrywka = rozgrywka;
 		szybkoscWeza = new int[2];
-		szybkoscWeza[0] = 4;
+		szybkoscWeza[0] = 3+numerWeza;
 		szybkoscWeza[1] = 0;
 		kierunekWeza = 2;
 		czyWazZyje=true;
@@ -39,13 +43,6 @@ public class Waz {
 	}
 
 	public void zrobKrok() {
-		
-//		if(!czyWazMozeCofnac) {
-//			if(staryKierunekWeza==0&&kierunekWeza==2||staryKierunekWeza==2&&kierunekWeza==0||staryKierunekWeza==1&&kierunekWeza==3||staryKierunekWeza==3&&kierunekWeza==1) {
-//				kierunekWeza=staryKierunekWeza;
-//				return;
-//			}
-//		}
 		
 		if(czyWazZyje) {
 		
@@ -80,6 +77,8 @@ public class Waz {
 			}
 			else {
 				smiercWeza();
+				cialoWeza.remove(cialoWeza.size() - 1);
+				return;
 			}
 		}
 		if(!czyWazPrzenikaInnych) {
@@ -96,8 +95,11 @@ public class Waz {
 				else if(kierunekWeza==3)
 					x++;
 				for(int j = 0; j<rozgrywka.waz[i].cialoWeza.size();j++)
-					if(rozgrywka.waz[i].cialoWeza.get(j)[0]==y&&rozgrywka.waz[i].cialoWeza.get(j)[1]==x)
+					if(rozgrywka.waz[i].cialoWeza.get(j)[0]==y&&rozgrywka.waz[i].cialoWeza.get(j)[1]==x) {
 						smiercWeza();
+						cialoWeza.remove(cialoWeza.size() - 1);
+						return;
+					}
 			}
 		}
 		}
@@ -113,8 +115,11 @@ public class Waz {
 			else if(kierunekWeza==3)
 				x++;
 			for(int i = 1; i<cialoWeza.size();i++)
-				if(cialoWeza.get(i)[0]==y&&cialoWeza.get(i)[1]==x)
+				if(cialoWeza.get(i)[0]==y&&cialoWeza.get(i)[1]==x) {
 					smiercWeza();
+					cialoWeza.remove(cialoWeza.size() - 1);
+					return;
+				}
 		}
 		
 
@@ -124,6 +129,7 @@ public class Waz {
 	}
 
 	public void smiercWeza() {
+		smierci++;
 		czyWazZyje=false;
 		if(!czyWazZostawiaCialo) {
 			for(int i = cialoWeza.size()-1; i>0;i--)

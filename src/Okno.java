@@ -1,3 +1,5 @@
+import java.awt.Dimension;
+
 import javax.swing.JFrame;
 
 public class Okno extends JFrame {
@@ -8,8 +10,8 @@ public class Okno extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setLocationRelativeTo(null);
-
-		Rozgrywka rozgrywka = new Rozgrywka(this, 30, 15, 3);
+		
+		Rozgrywka rozgrywka = new Rozgrywka(this, 25, 10, 2);
 	}
 
 	public static void main(String[] args) throws Exception {
