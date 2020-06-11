@@ -10,7 +10,7 @@ public class Okno extends JFrame {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setLocationRelativeTo(null);
-		
+
 		Rozgrywka rozgrywka = new Rozgrywka(this, 25, 10, 2);
 	}
 

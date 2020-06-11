@@ -26,6 +26,10 @@ public class Rozgrywka {
 
 		reset();
 
+		try {
+			Thread.sleep(100);
+		} catch (InterruptedException e) {
+		}
 		petlaGlowna();
 
 	}
@@ -61,35 +65,10 @@ public class Rozgrywka {
 		}
 
 		waz = new Waz[ileGraczy];
-		for (int i = 0; i < ileGraczy; i++)
-			waz[i] = new Waz(this, i,i+1,1,true,false,true,true);
-
 		for (int i = 0; i < ileGraczy; i++) {
-
-			waz[i].cialoWeza.add(0, new int[2]);
-			waz[i].cialoWeza.get(0)[0] = 0;
-			waz[i].cialoWeza.get(0)[1] = i;
-
-			waz[i].cialoWeza.add(0, new int[2]);
-			waz[i].cialoWeza.get(0)[0] = 1;
-			waz[i].cialoWeza.get(0)[1] = i;
-
-			waz[i].cialoWeza.add(0, new int[2]);
-			waz[i].cialoWeza.get(0)[0] = 2;
-			waz[i].cialoWeza.get(0)[1] = i;
-
-			waz[i].cialoWeza.add(0, new int[2]);
-			waz[i].cialoWeza.get(0)[0] = 3;
-			waz[i].cialoWeza.get(0)[1] = i;
-			
-			waz[i].cialoWeza.add(0, new int[2]);
-			waz[i].cialoWeza.get(0)[0] = 4;
-			waz[i].cialoWeza.get(0)[1] = i;
-			
-			waz[i].cialoWeza.add(0, new int[2]);
-			waz[i].cialoWeza.get(0)[0] = 5;
-			waz[i].cialoWeza.get(0)[1] = i;
-
+			waz[i] = new Waz(this, i, i + 1, 1, true, 2, true, true, true);
+			waz[i].respawn();
 		}
+
 	}
 }
