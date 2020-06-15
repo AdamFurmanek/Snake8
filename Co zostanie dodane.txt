@@ -10,3 +10,20 @@ Opcje trybu gry: ile rund, jaki czas na rundê, obiekty jakie maj¹ siê pojawiaæ, 
 
 Gra bêdzie udŸwiêkowiona
 
+
+
+
+obiekty maja czestotliwosc pojawiania i limit
+
+0. dodaje punkt					(sobie) ¯Ó£TY
+
+1. przenikanie wê¿ów 				(sobie/wszystkim) RÓ¯OWY
+2. szybkosc 					(sobie/innym/wszystkim) NIEBIESKI
+3. spowolnienie					(sobie/innym/wszystkim) POMARAÑCZOWY
+4. odbijanie od œcian				(sobie/wszystkim) FIOLETOWY
+
+5. uciêcie ogona					(sobie/innym/wszystkim) JASNONIEBIESKI
+6. leczenie					(sobie/wszystkim) ZIELONY
+7. zadaje obra¿enia 				(sobie/innym/wszystkim) CZERWONY
+
+- poprawiæ wyœwietlanie wyników na ekran

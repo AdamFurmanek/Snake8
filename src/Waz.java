@@ -18,19 +18,21 @@ public class Waz {
 	int hp = 100, punkty = 0, zgony = 0;
 	// 0 - gora; 1 - lewo; 2 - dol; 3 - prawo; 4 - stop
 	int kierunek;
-	int przenikanie = 0, odbijanie = -1; // -2 ODBIERA 10hp; -1 NIE ROBI NIC; 0 ZABIJA; >0 NIC NIE ROBI PRZEZ PODANY
+	int przenikanie = -1, odbijanie = -1; // -2 ODBIERA 10hp; -1 NIE ROBI NIC; 0 ZABIJA; >0 NIC NIE ROBI PRZEZ PODANY
 											// CZAS
+	String pseudonim;
 
 	public Waz(Rozgrywka rozgrywka, int numer, int kolor) {
 
+		pseudonim = new String("Gracz " + numer);
 		this.kolor = kolor;
 		this.rozgrywka = rozgrywka;
 		this.numer = numer;
 		cialo = new ArrayList<int[]>();
 		szybkosc = new int[3];
-		szybkosc[0] = 10;
+		szybkosc[0] = 4;
 		szybkosc[1] = 0;
-		szybkosc[2] = 0;
+		szybkosc[2] = -1;
 
 	}
 
@@ -41,7 +43,15 @@ public class Waz {
 			if (i != numer && rozgrywka.waz.get(i).kolizja(cialo.get(0)[1], cialo.get(0)[0]))
 				// BLOK REAKCJI NA UDERZENIE PRZECIWNIKA
 				if (przenikanie == 0) {
+					// SPRAWDZENIE CZY TO BYLA GLOWA, CZY CIALO OBCEGO WEZA
+					if (kolizja(rozgrywka.waz.get(i).cialo.get(0)[1], rozgrywka.waz.get(i).cialo.get(0)[0])) {
+						if (rozgrywka.waz.get(i).przenikanie == 0)
+							rozgrywka.waz.get(i).flagaSynchronizacjiSmierci = 1;
+						else if (rozgrywka.waz.get(i).przenikanie == -2)
+							rozgrywka.waz.get(i).hp -= 10;
+					}
 					flagaSynchronizacjiSmierci = 1;
+					return;
 				} else if (przenikanie == -2)
 					hp -= 10;
 		}
@@ -64,20 +74,25 @@ public class Waz {
 			x++;
 			break;
 		}
-
 		if (x < 0 || y < 0 || x >= rozgrywka.szerokoscMapy || y >= rozgrywka.wysokoscMapy
 				|| rozgrywka.mapa[y][x] == 1) {
-			if (odbijanie == 0)
+			if (odbijanie == 0) {
 				flagaSynchronizacjiSmierci = 1;
-			else {
-				if (kierunek == 0)
+				return;
+			} else {
+				if (kierunek == 0) {
+					flagaZmianyKierunku = 2;
 					kierunek = 2;
-				else if (kierunek == 2)
+				} else if (kierunek == 2) {
+					flagaZmianyKierunku = 0;
 					kierunek = 0;
-				else if (kierunek == 1)
+				} else if (kierunek == 1) {
+					flagaZmianyKierunku = 3;
 					kierunek = 3;
-				else if (kierunek == 3)
+				} else if (kierunek == 3) {
+					flagaZmianyKierunku = 1;
 					kierunek = 1;
+				}
 				if (odbijanie == -2)
 					hp -= 10;
 			}
@@ -163,6 +178,7 @@ public class Waz {
 		}
 
 		kierunek = 4;
+		flagaZmianyKierunku = 4;
 
 		cialo.add(0, new int[4]);
 		cialo.get(0)[0] = y3;
@@ -187,25 +203,25 @@ public class Waz {
 
 		// WYKONANIE ZAMOWIONEJ SMIERCI PRZEZ FLAGE
 		if (flagaSynchronizacjiSmierci == 1) {
-			flagaSynchronizacjiSmierci--;
+			flagaSynchronizacjiSmierci = 0;
 			smierc();
+			return;
 		}
-
-		// WYKONANIE ZAMOWIONEJ ZMIANY KIERUNKU
-		if (flagaZmianyKierunku != 4 && (kierunek == 4 || przenikanie != 0
-				|| (kierunek != flagaZmianyKierunku + 2 && kierunek + 2 != flagaZmianyKierunku)))
-			kierunek = flagaZmianyKierunku;
 
 		// WYKONANIE RUCHU CO OKRESLONY SKOK CZASU (SZYBKOSC)
 		szybkosc[1]++;
 		if (szybkosc[0] <= szybkosc[1]) {
+			// WYKONANIE ZAMOWIONEJ ZMIANY KIERUNKU
+			if (flagaZmianyKierunku != 4 && (kierunek == 4 || przenikanie != 0
+					|| (kierunek != flagaZmianyKierunku + 2 && kierunek + 2 != flagaZmianyKierunku)))
+				kierunek = flagaZmianyKierunku;
 			szybkosc[1] = 0;
 			krok();
 		}
 
 		// ODLICZANIE POZOSTALEGO CZASU DLA SPOWONIENIA/PRZYSPIESZENIA
 		if (szybkosc[2] == 0)
-			szybkosc[0] = 10;
+			szybkosc[0] = rozgrywka.domyslnaSzybkosc;
 		else if (szybkosc[2] > 0)
 			szybkosc[2]--;
 
