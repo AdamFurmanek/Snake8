@@ -1,37 +1,48 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class Rozgrywka {
 
-	Okno okno;
 	Ekran ekran;
+	Okno okno;
 
-	int ileGraczy;
+	List<Waz> waz;
+	List<Przedmiot> przedmiot;
+
 	int szerokoscMapy, wysokoscMapy;
-	char[][][] mapa;
-	Waz[] waz;
 
-	int[][] szybkoscWeza;
-	int[][] pozycjaWeza;
+	int[][] mapa;
 
 	public Rozgrywka(Okno okno, int szerokoscMapy, int wysokoscMapy, int ileGraczy) {
 
-		this.okno = okno;
 		this.szerokoscMapy = szerokoscMapy;
 		this.wysokoscMapy = wysokoscMapy;
-		this.ileGraczy = ileGraczy;
+
+		reset(ileGraczy);
 
 		ekran = new Ekran(this);
+		this.okno = okno;
 		okno.add(ekran);
 
-		reset();
-
-		try {
-			Thread.sleep(100);
-		} catch (InterruptedException e) {
-		}
 		petlaGlowna();
 
+	}
+
+	void reset(int ileGraczy) {
+
+		// wygenerowanie losowej mapy
+		Random random = new Random();
+		mapa = new int[wysokoscMapy][szerokoscMapy];
+		for (int i = 0; i < wysokoscMapy; i++)
+			for (int j = 0; j < szerokoscMapy; j++)
+				mapa[i][j] = random.nextInt(5);
+
+		waz = new ArrayList<Waz>();
+		for (int i = 0; i < ileGraczy; i++) {
+			waz.add(new Waz(this, i, i));
+			waz.get(i).respawn();
+		}
 	}
 
 	void petlaGlowna() {
@@ -41,34 +52,11 @@ public class Rozgrywka {
 				Thread.sleep(20);
 			} catch (InterruptedException e) {
 			}
-			for (int i = 0; i < ileGraczy; i++) {
-				waz[i].szybkoscWeza[1]++;
-				if (waz[i].szybkoscWeza[0] <= waz[i].szybkoscWeza[1]) {
-					waz[i].szybkoscWeza[1] = 0;
-					waz[i].zrobKrok();
-				}
+			for (int i = 0; i < waz.size(); i++) {
+				waz.get(i).licznik();
 			}
 			ekran.repaint();
 		}
 	}
 
-	void reset() {
-
-		mapa = new char[wysokoscMapy][szerokoscMapy][3];
-
-		for (int i = 0; i < wysokoscMapy; i++) {
-			for (int j = 0; j < szerokoscMapy; j++) {
-				mapa[i][j][0] = '0';
-				mapa[i][j][1] = '0';
-				mapa[i][j][2] = '0';
-			}
-		}
-
-		waz = new Waz[ileGraczy];
-		for (int i = 0; i < ileGraczy; i++) {
-			waz[i] = new Waz(this, i, i + 1, 1, true, 2, true, true, true);
-			waz[i].respawn();
-		}
-
-	}
 }

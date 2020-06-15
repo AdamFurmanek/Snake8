@@ -13,14 +13,14 @@ import javax.swing.JPanel;
 
 public class Ekran extends JPanel implements KeyListener {
 
+	char klawiszKlawiatury[][] = { { 'w', 'a', 's', 'd' }, { 't', 'f', 'g', 'h' }, { 'i', 'j', 'k', 'l' },
+			{ '5', '1', '2', '3' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' },
+			{ 'x', 'x', 'x', 'x' } };
+
 	Rozgrywka rozgrywka;
 
 	double skalaWysokoscOkno, skalaSzerokoscOkno;
 	double skalaWysokoscMapa, skalaSzerokoscMapa;
-
-	char klawiszKlawiatury[][] = { { 'w', 'a', 's', 'd' }, { 't', 'f', 'g', 'h' }, { 'i', 'j', 'k', 'l' },
-			{ '5', '1', '2', '3' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' },
-			{ 'x', 'x', 'x', 'x' } };
 
 	Font font;
 
@@ -43,167 +43,70 @@ public class Ekran extends JPanel implements KeyListener {
 		addKeyListener(this);
 		setFocusable(true);
 
-		repaint();
 	}
 
 	public void paintComponent(Graphics g) {
 
 		Graphics2D g2d = (Graphics2D) g.create();
+
+		// USTAWIENIE SKALI NA PODSTAWIE WIELKOSCI OKNA
 		AffineTransform at = new AffineTransform();
 		at.scale(skalaSzerokoscOkno, skalaWysokoscOkno);
 		g2d.setTransform(at);
+
+		// RYSOWANIE TLA I PLYTY PANELU Z WYNIKAMI
 		new ImageIcon("images/tlo2.png").paintIcon(this, g2d, 0, 0);
 		new ImageIcon("images/00.png").paintIcon(this, g2d, 99, 820);
 
 		at.scale(skalaSzerokoscMapa, skalaWysokoscMapa);
 		g2d.setTransform(at);
 
+		// RYSOWANIE PANELU Z WYNIKAMI
 		g2d.setFont(font);
-		for (int i = 0; i < rozgrywka.ileGraczy; i++) {
-			new ImageIcon("images/" + (rozgrywka.waz[i].kolorWeza) + "gw.png").paintIcon(this, g2d, 1100 + i * 450,
+		for (int i = 0; i < rozgrywka.waz.size(); i++) {
+			new ImageIcon("images/" + (rozgrywka.waz.get(i).kolor) + "gw.png").paintIcon(this, g2d, 1100 + i * 450,
 					2440);
 			g2d.setColor(Color.BLACK);
-			g2d.drawString(rozgrywka.waz[i].hp + "", 1100 + i * 450, 2680);
+			g2d.drawString(rozgrywka.waz.get(i).hp + "", 1100 + i * 450, 2680);
 			g2d.setColor(Color.GREEN);
-			g2d.drawString(rozgrywka.waz[i].punkty + "", 1080 + i * 450, 2510);
+			g2d.drawString(rozgrywka.waz.get(i).punkty + "", 1080 + i * 450, 2510);
 			g2d.setColor(Color.RED);
-			g2d.drawString(rozgrywka.waz[i].smierc + "", 1250 + i * 450, 2510);
+			g2d.drawString(rozgrywka.waz.get(i).zgony + "", 1250 + i * 450, 2510);
 		}
 
-		for (int i = 0; i < rozgrywka.wysokoscMapy; i++) {
-			for (int j = 0; j < rozgrywka.szerokoscMapy; j++) {
-				new ImageIcon("images/0.png").paintIcon(this, g2d, (int) (94 / (skalaSzerokoscMapa) + j * 200),
-						(int) (77 / (skalaWysokoscMapa) + i * 200));
-			}
-		}
+		// RYSOWANIE MAPY
+		for (int i = 0; i < rozgrywka.wysokoscMapy; i++)
+			for (int j = 0; j < rozgrywka.szerokoscMapy; j++)
+				if (rozgrywka.mapa[i][j] != 1)
+					new ImageIcon("images/0.png").paintIcon(this, g2d, (int) (94 / (skalaSzerokoscMapa) + j * 200),
+							(int) (77 / (skalaWysokoscMapa) + i * 200));
 
-		for (int i = 0; i < rozgrywka.ileGraczy; i++) {
+		// RYSOWANIE WEZOW
+		for (int i = 0; i < rozgrywka.waz.size(); i++)
+			for (int j = 0; j < rozgrywka.waz.get(i).cialo.size(); j++)
+				new ImageIcon("images/" + rozgrywka.waz.get(i).kolor + "/" + rozgrywka.waz.get(i).cialo.get(j)[2]
+						+ rozgrywka.waz.get(i).cialo.get(j)[3] + ".png").paintIcon(this, g2d,
+								(int) (94 / (skalaSzerokoscMapa) + rozgrywka.waz.get(i).cialo.get(j)[1] * 200),
+								(int) (77 / (skalaWysokoscMapa) + rozgrywka.waz.get(i).cialo.get(j)[0] * 200));
 
-			if (rozgrywka.waz[i].cialoWeza.size() > 0) {
-
-				String sciezka = new String("images/" + rozgrywka.waz[i].kolorWeza);
-
-				int y = rozgrywka.waz[i].cialoWeza.get(0)[0];
-				int x = rozgrywka.waz[i].cialoWeza.get(0)[1];
-				int y2 = rozgrywka.waz[i].cialoWeza.get(1)[0];
-				int x2 = rozgrywka.waz[i].cialoWeza.get(1)[1];
-				int y3 = rozgrywka.waz[i].cialoWeza.get(2)[0];
-				int x3 = rozgrywka.waz[i].cialoWeza.get(2)[1];
-
-				if (y == y2 + 1 || y == y2 - rozgrywka.wysokoscMapy + 1)
-					sciezka += "gs.png";
-				else if (y == y2 - 1 || y == y2 + rozgrywka.wysokoscMapy - 1)
-					sciezka += "gw.png";
-				else if (x == x2 + 1 || x == x2 - rozgrywka.szerokoscMapy + 1)
-					sciezka += "gd.png";
-				else if (x == x2 - 1 || x == x2 + rozgrywka.szerokoscMapy - 1)
-					sciezka += "ga.png";
-				else if (y == y2 && x == x2) {
-					if (y == y3 + 1 || y == y3 - rozgrywka.wysokoscMapy + 1)
-						sciezka += "cws.png";
-					else if (y == y3 - 1 || y == y3 + rozgrywka.wysokoscMapy - 1)
-						sciezka += "cws.png";
-					else if (x == x3 + 1 || x == x3 - rozgrywka.szerokoscMapy + 1)
-						sciezka += "cad.png";
-					else if (x == x3 - 1 || x == x3 + rozgrywka.szerokoscMapy - 1)
-						sciezka += "cad.png";
-				}
-
-				new ImageIcon(sciezka).paintIcon(this, g2d,
-						(int) (94 / (skalaSzerokoscMapa) + rozgrywka.waz[i].cialoWeza.get(0)[1] * 200),
-						(int) (77 / (skalaWysokoscMapa) + rozgrywka.waz[i].cialoWeza.get(0)[0] * 200));
-
-				for (int j = 1; j < rozgrywka.waz[i].cialoWeza.size() - 1; j++) {
-					sciezka = new String("images/" + rozgrywka.waz[i].kolorWeza);
-
-					y = rozgrywka.waz[i].cialoWeza.get(j)[0];
-					x = rozgrywka.waz[i].cialoWeza.get(j)[1];
-					y2 = rozgrywka.waz[i].cialoWeza.get(j + 1)[0];
-					x2 = rozgrywka.waz[i].cialoWeza.get(j + 1)[1];
-					y3 = rozgrywka.waz[i].cialoWeza.get(j - 1)[0];
-					x3 = rozgrywka.waz[i].cialoWeza.get(j - 1)[1];
-
-					if (y == y3 - 1 || y == y3 + rozgrywka.wysokoscMapy - 1) { // idzie w dol
-						if (x == x2 + 1 || x == x2 - rozgrywka.szerokoscMapy + 1)
-							sciezka += "cas.png";
-						else if (x == x2 - 1 || x == x2 + rozgrywka.szerokoscMapy - 1)
-							sciezka += "csd.png";
-						else
-							sciezka += "cws.png";
-					} else if (y == y3 + 1 || y == y3 - rozgrywka.wysokoscMapy + 1) { // idzie w gore
-						if (x == x2 + 1 || x == x2 - rozgrywka.szerokoscMapy + 1)
-							sciezka += "cwa.png";
-						else if (x == x2 - 1 || x == x2 + rozgrywka.szerokoscMapy - 1)
-							sciezka += "cwd.png";
-						else
-							sciezka += "cws.png";
-					} else if (x == x3 - 1 || x == x3 + rozgrywka.szerokoscMapy - 1) { // idzie w prawo
-						if (y == y2 + 1 || y == y2 - rozgrywka.wysokoscMapy + 1)
-							sciezka += "cwd.png";
-						else if (y == y2 - 1 || y == y2 + rozgrywka.wysokoscMapy - 1)
-							sciezka += "csd.png";
-						else
-							sciezka += "cad.png";
-					} else if (x == x3 + 1 || x == x3 - rozgrywka.szerokoscMapy + 1) { // idzie w lewo
-						if (y == y2 + 1 || y == y2 - rozgrywka.wysokoscMapy + 1)
-							sciezka += "cwa.png";
-						else if (y == y2 - 1 || y == y2 + rozgrywka.wysokoscMapy - 1)
-							sciezka += "cas.png";
-						else
-							sciezka += "cad.png";
-					}
-
-					new ImageIcon(sciezka).paintIcon(this, g2d,
-							(int) (94 / (skalaSzerokoscMapa) + rozgrywka.waz[i].cialoWeza.get(j)[1] * 200),
-							(int) (77 / (skalaWysokoscMapa) + rozgrywka.waz[i].cialoWeza.get(j)[0] * 200));
-				}
-
-				sciezka = new String("images/" + rozgrywka.waz[i].kolorWeza);
-
-				y = rozgrywka.waz[i].cialoWeza.get(rozgrywka.waz[i].cialoWeza.size() - 1)[0];
-				x = rozgrywka.waz[i].cialoWeza.get(rozgrywka.waz[i].cialoWeza.size() - 1)[1];
-				y3 = rozgrywka.waz[i].cialoWeza.get(rozgrywka.waz[i].cialoWeza.size() - 2)[0];
-				x3 = rozgrywka.waz[i].cialoWeza.get(rozgrywka.waz[i].cialoWeza.size() - 2)[1];
-
-				if (y == y3 + 1 || y == y3 - rozgrywka.wysokoscMapy + 1)
-					sciezka += "ow.png";
-				else if (y == y3 - 1 || y == y3 + rozgrywka.wysokoscMapy - 1)
-					sciezka += "os.png";
-				else if (x == x3 + 1 || x == x3 - rozgrywka.szerokoscMapy + 1)
-					sciezka += "oa.png";
-				else if (x == x3 - 1 || x == x3 + rozgrywka.szerokoscMapy - 1)
-					sciezka += "od.png";
-
-				new ImageIcon(sciezka).paintIcon(this, g2d,
-						(int) (94 / (skalaSzerokoscMapa)
-								+ rozgrywka.waz[i].cialoWeza.get(rozgrywka.waz[i].cialoWeza.size() - 1)[1] * 200),
-						(int) (77 / (skalaWysokoscMapa)
-								+ rozgrywka.waz[i].cialoWeza.get(rozgrywka.waz[i].cialoWeza.size() - 1)[0] * 200));
-			}
-		}
+		// RYSOWANIE PRZEDMIOTOW
+//		for(int i=0;i<rozgrywka.przedmiot.size();i++) {
+//			
+//		}
 	}
 
 	public void keyTyped(KeyEvent e) {
 	}
 
 	public void keyPressed(KeyEvent e) {
-		for (int i = 0; i < 8; i++) {
+		for (int i = 0; i < 8; i++)
 			for (int j = 0; j < 4; j++)
 				if (e.getKeyChar() == klawiszKlawiatury[i][j]) {
-					if (!rozgrywka.waz[i].czyWazMozeCofnac) {
-						if (j == 0 && rozgrywka.waz[i].kierunekWeza == 2 || j == 2 && rozgrywka.waz[i].kierunekWeza == 0
-								|| j == 1 && rozgrywka.waz[i].kierunekWeza == 3
-								|| j == 3 && rozgrywka.waz[i].kierunekWeza == 1)
-							return;
-						else
-							rozgrywka.waz[i].kierunekWeza = j;
-					} else
-						rozgrywka.waz[i].kierunekWeza = j;
+					rozgrywka.waz.get(i).flagaZmianyKierunku = j;
 				}
-		}
-
 	}
 
 	public void keyReleased(KeyEvent e) {
 	}
+
 }

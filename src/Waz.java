@@ -4,210 +4,231 @@ import java.util.Random;
 
 public class Waz {
 
-	List<int[]> cialoWeza;
-	int[] szybkoscWeza;
-	boolean czyWazZyje;
-	boolean czyWazZostawiaCialo;
-	int czyWazPrzenikaInnych;
-	boolean czyWazPrzenikaSiebie;
-	boolean czyWazMozeCofnac;
-	boolean czyZmartwychwstaje;
-	int numerWeza;
-	int kierunekWeza;
-	int kolorWeza;
-	int reakcjaNaSciane; // 0-umiera,1-odbija sie,2-przenika
 	Rozgrywka rozgrywka;
-	int punkty = 0;
-	int smierc = 0;
-	int hp = 100;
 
-	public Waz(Rozgrywka rozgrywka, int numerWeza, int kolorWeza, int reakcjaNaSciane, boolean czyWazZostawiaCialo,
-			int czyWazPrzenikaInnych, boolean czyWazPrzenikaSiebie, boolean czyWazMozeCofnac,
-			boolean czyZmartwychwstaje) {
+	List<int[]> cialo;
 
-		this.czyZmartwychwstaje = czyZmartwychwstaje;
-		this.czyWazMozeCofnac = czyWazMozeCofnac;
-		this.czyWazPrzenikaSiebie = czyWazPrzenikaSiebie;
-		if (!czyWazPrzenikaSiebie)
-			czyWazMozeCofnac = false;
-		this.numerWeza = numerWeza;
-		this.czyWazPrzenikaInnych = czyWazPrzenikaInnych; // 0 - przenika, 1 - zabiera hp, 2 - umiera
-		this.reakcjaNaSciane = reakcjaNaSciane;
-		this.kolorWeza = kolorWeza;
+	int flagaSynchronizacjiSmierci = 0; // Flaga potrzebna do wykonania smierci weza, dopiero po przejsciu licznika dla
+										// wszystkich wezow. Zapobiega to sytuacji w ktorej gdy dwa weze uderza czolowo
+										// (czyli oba powinny umrzec), jeden zostaje usuniety od razu, dzieki czemu
+										// drugi nie widzi ze stal w miejscu z innym wezem i nie wykonuje smierci.
+	int flagaZmianyKierunku = 4;
+	int[] szybkosc;
+	int numer, kolor;
+	int hp = 100, punkty = 0, zgony = 0;
+	// 0 - gora; 1 - lewo; 2 - dol; 3 - prawo; 4 - stop
+	int kierunek;
+	int przenikanie = 0, odbijanie = -1; // -2 ODBIERA 10hp; -1 NIE ROBI NIC; 0 ZABIJA; >0 NIC NIE ROBI PRZEZ PODANY
+											// CZAS
+
+	public Waz(Rozgrywka rozgrywka, int numer, int kolor) {
+
+		this.kolor = kolor;
 		this.rozgrywka = rozgrywka;
-		szybkoscWeza = new int[2];
-		szybkoscWeza[0] = 5;
-		szybkoscWeza[1] = 0;
-		czyWazZyje = true;
-		this.czyWazZostawiaCialo = czyWazZostawiaCialo;
+		this.numer = numer;
+		cialo = new ArrayList<int[]>();
+		szybkosc = new int[3];
+		szybkosc[0] = 10;
+		szybkosc[1] = 0;
+		szybkosc[2] = 0;
 
-		cialoWeza = new ArrayList<int[]>();
 	}
 
-	public void zrobKrok() {
+	void krok() {
 
-		if (czyWazZyje && kierunekWeza != 4) {
+		// BLOK OBECNEJ KOLIZJI
+		for (int i = 0; i < rozgrywka.waz.size(); i++) {
+			if (i != numer && rozgrywka.waz.get(i).kolizja(cialo.get(0)[1], cialo.get(0)[0]))
+				// BLOK REAKCJI NA UDERZENIE PRZECIWNIKA
+				if (przenikanie == 0) {
+					flagaSynchronizacjiSmierci = 1;
+				} else if (przenikanie == -2)
+					hp -= 10;
+		}
 
-			cialoWeza.add(0, new int[2]);
-			cialoWeza.get(0)[0] = cialoWeza.get(1)[0];
-			cialoWeza.get(0)[1] = cialoWeza.get(1)[1];
+		// BLOK PRZYSZLEJ KOLIZJI
+		int x = cialo.get(0)[1], y = cialo.get(0)[0];
 
-			if (kierunekWeza == 2 && cialoWeza.get(0)[0] < rozgrywka.wysokoscMapy - 1)
-				cialoWeza.get(0)[0]++;
-			else if (kierunekWeza == 0 && cialoWeza.get(0)[0] > 0)
-				cialoWeza.get(0)[0]--;
-			else if (kierunekWeza == 3 && cialoWeza.get(0)[1] < rozgrywka.szerokoscMapy - 1)
-				cialoWeza.get(0)[1]++;
-			else if (kierunekWeza == 1 && cialoWeza.get(0)[1] > 0)
-				cialoWeza.get(0)[1]--;
+		cialo.get(0)[3] = kierunek;
+		switch (kierunek) {
+		case 0:
+			y--;
+			break;
+		case 1:
+			x--;
+			break;
+		case 2:
+			y++;
+			break;
+		case 3:
+			x++;
+			break;
+		}
+
+		if (x < 0 || y < 0 || x >= rozgrywka.szerokoscMapy || y >= rozgrywka.wysokoscMapy
+				|| rozgrywka.mapa[y][x] == 1) {
+			if (odbijanie == 0)
+				flagaSynchronizacjiSmierci = 1;
 			else {
-				if (reakcjaNaSciane == 2) { // mozna przechodzic przez sciany
-					if (kierunekWeza == 2 && cialoWeza.get(0)[0] == rozgrywka.wysokoscMapy - 1)
-						cialoWeza.get(0)[0] = 0;
-					else if (kierunekWeza == 0 && cialoWeza.get(0)[0] == 0)
-						cialoWeza.get(0)[0] = rozgrywka.wysokoscMapy - 1;
-					else if (kierunekWeza == 3 && cialoWeza.get(0)[1] == rozgrywka.szerokoscMapy - 1)
-						cialoWeza.get(0)[1] = 0;
-					else if (kierunekWeza == 1 && cialoWeza.get(0)[1] == 0)
-						cialoWeza.get(0)[1] = rozgrywka.szerokoscMapy - 1;
-				} else if (reakcjaNaSciane == 1) { // odbicie
-
-					kierunekWeza += 2;
-					if (kierunekWeza > 3)
-						kierunekWeza -= 4;
-				} else {
-					smiercWeza();
-					return;
-				}
-			}
-			if (czyWazPrzenikaInnych > 0) {
-				for (int i = 0; i < rozgrywka.ileGraczy; i++) {
-					if (numerWeza != i) {
-						int y = cialoWeza.get(0)[0];
-						int x = cialoWeza.get(0)[1];
-						for (int j = 0; j < rozgrywka.waz[i].cialoWeza.size(); j++)
-							if (rozgrywka.waz[i].cialoWeza.get(j)[0] == y
-									&& rozgrywka.waz[i].cialoWeza.get(j)[1] == x) {
-								if (czyWazPrzenikaInnych == 2) {
-									smiercWeza();
-									return;
-								} else if (czyWazPrzenikaInnych == 1) {
-									hp -= 10;
-									if (hp == 0) {
-										smiercWeza();
-										return;
-									}
-								}
-							}
-					}
-				}
-			}
-			if (!czyWazPrzenikaSiebie) {
-				int y = cialoWeza.get(0)[0];
-				int x = cialoWeza.get(0)[1];
-				if (kierunekWeza == 0)
-					y--;
-				else if (kierunekWeza == 1)
-					x--;
-				else if (kierunekWeza == 2)
-					y++;
-				else if (kierunekWeza == 3)
-					x++;
-				for (int i = 1; i < cialoWeza.size(); i++)
-					if (cialoWeza.get(i)[0] == y && cialoWeza.get(i)[1] == x) {
-						smiercWeza();
-						return;
-					}
+				if (kierunek == 0)
+					kierunek = 2;
+				else if (kierunek == 2)
+					kierunek = 0;
+				else if (kierunek == 1)
+					kierunek = 3;
+				else if (kierunek == 3)
+					kierunek = 1;
+				if (odbijanie == -2)
+					hp -= 10;
 			}
 
-			cialoWeza.remove(cialoWeza.size() - 1);
+		}
+
+		// WYKONANIE RUCHU
+		else if (kierunek != 4) {
+
+			cialo.add(0, new int[4]);
+			cialo.get(0)[0] = y;
+			cialo.get(0)[1] = x;
+			cialo.get(0)[2] = kierunek;
+			cialo.get(0)[3] = 4;
+
+			cialo.remove(cialo.size() - 1);
+			cialo.get(cialo.size() - 1)[2] = 4;
 		}
 	}
 
-	public void respawn() {
-		int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0, x4 = 0, y4 = 0;
-		int kierunek;
-		boolean wolne = false;
+	void smierc() {
+		zgony++;
+		cialo.clear();
+		respawn();
+	}
+
+	void respawn() {
 		Random random = new Random();
-		while (!wolne) {
-			x1 = random.nextInt(rozgrywka.wysokoscMapy);
-			y1 = random.nextInt(rozgrywka.szerokoscMapy);
-			kierunek = random.nextInt(4);
-			if (kierunek == 0) {
-				y2 = y1 - 1;
-				y3 = y2 - 1;
-				x2 = x1;
-				x3 = x2;
-			} else if (kierunek == 2) {
+		int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
+		boolean zajete = true;
+		int ulozenieCiala = 0;
+
+		while (zajete) {
+			// WYLOSOWANIE WSPOLRZEDNYCH GLOWKI WEZA
+			x1 = random.nextInt(rozgrywka.szerokoscMapy);
+			y1 = random.nextInt(rozgrywka.wysokoscMapy);
+			x2 = x1;
+			y2 = y1;
+			x3 = x1;
+			y3 = y1;
+
+			// WYLOSOWANIE KIERUNKU CIALA WEZA
+			ulozenieCiala = random.nextInt(4);
+			switch (ulozenieCiala) {
+			case 0:
 				y2 = y1 + 1;
 				y3 = y2 + 1;
-				x2 = x1;
-				x3 = x2;
-			} else if (kierunek == 1) {
-				y2 = y1;
-				y3 = y2;
-				x2 = x1 - 1;
-				x3 = x2 - 1;
-			} else if (kierunek == 3) {
-				y2 = y1;
-				y3 = y2;
+				break;
+			case 1:
 				x2 = x1 + 1;
 				x3 = x2 + 1;
+				break;
+			case 2:
+				y2 = y1 - 1;
+				y3 = y2 - 1;
+				break;
+			case 3:
+				x2 = x1 - 1;
+				x3 = x2 - 1;
+				break;
 			}
 
-			if (x1 >= 0 && x1 < rozgrywka.szerokoscMapy && x2 >= 0 && x2 < rozgrywka.szerokoscMapy && x3 >= 0
-					&& x3 < rozgrywka.szerokoscMapy && y1 >= 0 && y1 < rozgrywka.wysokoscMapy && y2 >= 0
-					&& y2 < rozgrywka.wysokoscMapy && y3 >= 0 && y3 < rozgrywka.wysokoscMapy)
-				wolne = true;
-			for (int i = 0; i < rozgrywka.ileGraczy; i++)
-				if (numerWeza != i && rozgrywka.waz[i] != null) {
-					System.out.println("Jestem wezem " + numerWeza + ", sprawdzam weza numer " + i);
+			zajete = false;
 
-					for (int j = 0; j < rozgrywka.waz[i].cialoWeza.size(); j++) {
-						y4 = rozgrywka.waz[i].cialoWeza.get(j)[0];
-						x4 = rozgrywka.waz[i].cialoWeza.get(j)[1];
-						System.out.println("Obcy waz ma: " + x4 + " " + y4 + ", a ja mam: " + x1 + " " + y1 + ", " + x2
-								+ " " + y2 + ", " + x3 + " " + y3);
-						if (x1 == x4 && y1 == y4 || x2 == x4 && y2 == y4 || x3 == x4 && y3 == y4) {
-							wolne = false;
-						}
-					}
-				}
+			// SPRAWDZENIE GRANIC
+			if (x3 < 0 || y3 < 0 || x3 >= rozgrywka.szerokoscMapy || y3 >= rozgrywka.wysokoscMapy)
+				zajete = true;
+
+			// SPRAWDZENIE SCIAN NA MAPIE
+			else if (rozgrywka.mapa[y1][x1] == 1 || rozgrywka.mapa[y2][x2] == 1 || rozgrywka.mapa[y3][x3] == 1)
+				zajete = true;
+
+			// SPRAWDZENIE KOLIZJI Z INNYMI WEZAMI
+			for (int i = 0; i < rozgrywka.waz.size(); i++)
+				if (rozgrywka.waz.get(i).kolizja(x1, y1) || rozgrywka.waz.get(i).kolizja(x2, y2)
+						|| rozgrywka.waz.get(i).kolizja(x3, y3))
+					zajete = true;
+
+			// SPRAWDZENIE KOLIZJI Z PRZEDMIOTAMI
+//			for(int i=0;i<rozgrywka.przedmiot.size();i++) {
+//			
+//			}
 		}
 
-		kierunekWeza = 4;
+		kierunek = 4;
 
-		cialoWeza.add(0, new int[2]);
-		cialoWeza.get(0)[0] = y1;
-		cialoWeza.get(0)[1] = x1;
+		cialo.add(0, new int[4]);
+		cialo.get(0)[0] = y3;
+		cialo.get(0)[1] = x3;
+		cialo.get(0)[2] = 4;
+		cialo.get(0)[3] = ulozenieCiala;
 
-		cialoWeza.add(0, new int[2]);
-		cialoWeza.get(0)[0] = y2;
-		cialoWeza.get(0)[1] = x2;
+		cialo.add(0, new int[4]);
+		cialo.get(0)[0] = y2;
+		cialo.get(0)[1] = x2;
+		cialo.get(0)[2] = ulozenieCiala;
+		cialo.get(0)[3] = ulozenieCiala;
 
-		cialoWeza.add(0, new int[2]);
-		cialoWeza.get(0)[0] = y3;
-		cialoWeza.get(0)[1] = x3;
+		cialo.add(0, new int[4]);
+		cialo.get(0)[0] = y1;
+		cialo.get(0)[1] = x1;
+		cialo.get(0)[2] = ulozenieCiala;
+		cialo.get(0)[3] = 4;
+	}
+
+	void licznik() {
+
+		// WYKONANIE ZAMOWIONEJ SMIERCI PRZEZ FLAGE
+		if (flagaSynchronizacjiSmierci == 1) {
+			flagaSynchronizacjiSmierci--;
+			smierc();
+		}
+
+		// WYKONANIE ZAMOWIONEJ ZMIANY KIERUNKU
+		if (flagaZmianyKierunku != 4 && (kierunek == 4 || przenikanie != 0
+				|| (kierunek != flagaZmianyKierunku + 2 && kierunek + 2 != flagaZmianyKierunku)))
+			kierunek = flagaZmianyKierunku;
+
+		// WYKONANIE RUCHU CO OKRESLONY SKOK CZASU (SZYBKOSC)
+		szybkosc[1]++;
+		if (szybkosc[0] <= szybkosc[1]) {
+			szybkosc[1] = 0;
+			krok();
+		}
+
+		// ODLICZANIE POZOSTALEGO CZASU DLA SPOWONIENIA/PRZYSPIESZENIA
+		if (szybkosc[2] == 0)
+			szybkosc[0] = 10;
+		else if (szybkosc[2] > 0)
+			szybkosc[2]--;
+
+		// ODLICZANIE POZOSTALEGO CZASU DLA PRZENIKANIA
+		if (przenikanie > 0)
+			przenikanie--;
+
+		// ODLICZANIE POZOSTALEGO CZASU DLA ODBIJANIA
+		if (odbijanie > 0)
+			odbijanie--;
 
 	}
 
-	public void smiercWeza() {
-		cialoWeza.remove(cialoWeza.size() - 1);
-		smierc++;
-		czyWazZyje = false;
-		if (!czyWazZostawiaCialo || czyZmartwychwstaje) {
-			cialoWeza.clear();
-		}
-		if (czyZmartwychwstaje) {
-			respawn();
-			czyWazZyje = true;
-		}
+	boolean kolizja(int x, int y) {
+		for (int i = 0; i < cialo.size(); i++)
+			if (cialo.get(i)[0] == y && cialo.get(i)[1] == x)
+				return true;
+		return false;
 	}
 
-	@Override
-	public String toString() {
-
-		return new String(
-				"Kierunek: " + kierunekWeza + ", szybkosc: " + szybkoscWeza[0] + ", licznik: " + szybkoscWeza[1]);
+	boolean kolizjaGlowy(int x, int y) {
+		if (cialo.get(0)[0] == y && cialo.get(0)[1] == x)
+			return true;
+		return false;
 	}
 }
