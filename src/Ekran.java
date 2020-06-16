@@ -17,6 +17,7 @@ public class Ekran extends JPanel implements KeyListener {
 			{ '5', '1', '2', '3' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' }, { 'x', 'x', 'x', 'x' },
 			{ 'x', 'x', 'x', 'x' } };
 
+	Okno okno;
 	Rozgrywka rozgrywka;
 
 	double skalaWysokoscOkno, skalaSzerokoscOkno;
@@ -24,28 +25,31 @@ public class Ekran extends JPanel implements KeyListener {
 
 	Font font;
 
-	public Ekran(Rozgrywka rozgrywka) {
+	public Ekran(Okno okno) {
 
-		this.rozgrywka = rozgrywka;
+		addKeyListener(this);
+		setFocusable(true);
+
+		this.okno = okno;
 
 		this.addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
-				skalaSzerokoscOkno = (double) rozgrywka.okno.getWidth() / 1920;
-				skalaWysokoscOkno = (double) rozgrywka.okno.getHeight() / 1080;
+				skalaSzerokoscOkno = (double) okno.getWidth() / 1920;
+				skalaWysokoscOkno = (double) okno.getHeight() / 1080;
 			}
 		});
+
+	}
+
+	public void paintComponent(Graphics g) {
+
+		if (rozgrywka == null)
+			return;
 
 		skalaSzerokoscMapa = (double) 1720 / (rozgrywka.szerokoscMapy * 200);
 		skalaWysokoscMapa = (double) 680 / (rozgrywka.wysokoscMapy * 200);
 
 		font = new Font("Gill Sans Ultra Bold", Font.BOLD, 72);
-
-		addKeyListener(this);
-		setFocusable(true);
-
-	}
-
-	public void paintComponent(Graphics g) {
 
 		Graphics2D g2d = (Graphics2D) g.create();
 
@@ -57,42 +61,38 @@ public class Ekran extends JPanel implements KeyListener {
 		// RYSOWANIE TLA I PLYTY PANELU Z WYNIKAMI
 		new ImageIcon("images/tlo2.png").paintIcon(this, g2d, 0, 0);
 		new ImageIcon("images/00.png").paintIcon(this, g2d, 99, 820);
-		
+
+		// KTÓRA RUNDA, ILE CZASU
 		g2d.setFont(font);
 		g2d.setColor(Color.BLACK);
 		at.scale(0.8, 0.8);
 		g2d.setTransform(at);
-		g2d.drawString(rozgrywka.runda[0]+"", 150, 1100);
-		g2d.drawString(rozgrywka.runda[1]+"", 150, 1180);
-		g2d.drawString((int)rozgrywka.runda[2]/50+"", 2060, 1140);
+		g2d.drawString(rozgrywka.runda[0] + "", 150, 1100);
+		g2d.drawString(rozgrywka.runda[1] + "", 150, 1180);
+		g2d.drawString((int) rozgrywka.runda[2] / 50 + "", 2060, 1140);
 		at.scale(1.25, 1.25);
 		g2d.setTransform(at);
-		
+
 		// RYSOWANIE PANELU Z WYNIKAMI
 		for (int i = 0; i < rozgrywka.waz.size(); i++) {
 
 			at.scale(0.4, 0.4);
 			g2d.setTransform(at);
-			
+
 			at.scale(0.5, 0.5);
 			g2d.setTransform(at);
-			if(rozgrywka.waz.get(i).przenikanie!=0)
-				new ImageIcon("images/p/1.png").paintIcon(this, g2d, 1770 + i * 900,
-						4200);
-			if(rozgrywka.waz.get(i).odbijanie!=0)
-				new ImageIcon("images/p/4.png").paintIcon(this, g2d, 1770 + i * 900,
-						4300);
-			if(rozgrywka.waz.get(i).szybkosc[0]>rozgrywka.domyslnaSzybkosc)
-				new ImageIcon("images/p/3.png").paintIcon(this, g2d, 1770 + i * 900,
-						4400);
-			else if(rozgrywka.waz.get(i).szybkosc[0]<rozgrywka.domyslnaSzybkosc)
-				new ImageIcon("images/p/2.png").paintIcon(this, g2d, 1770 + i * 900,
-						4400);
-			
+			if (rozgrywka.waz.get(i).przenikanie != 0)
+				new ImageIcon("images/p/1.png").paintIcon(this, g2d, 1770 + i * 900, 4200);
+			if (rozgrywka.waz.get(i).odbijanie != 0)
+				new ImageIcon("images/p/4.png").paintIcon(this, g2d, 1770 + i * 900, 4300);
+			if (rozgrywka.waz.get(i).szybkosc[0] > rozgrywka.domyslnaSzybkosc)
+				new ImageIcon("images/p/3.png").paintIcon(this, g2d, 1770 + i * 900, 4400);
+			else if (rozgrywka.waz.get(i).szybkosc[0] < rozgrywka.domyslnaSzybkosc)
+				new ImageIcon("images/p/2.png").paintIcon(this, g2d, 1770 + i * 900, 4400);
+
 			at.scale(2, 2);
 			g2d.setTransform(at);
-			
-			
+
 			at.scale(0.8, 0.8);
 			g2d.setTransform(at);
 			g2d.setColor(Color.BLACK);
@@ -101,20 +101,22 @@ public class Ekran extends JPanel implements KeyListener {
 			at.scale(1.25, 1.25);
 			g2d.setTransform(at);
 
-			
 			new ImageIcon("images/" + (rozgrywka.waz.get(i).kolor) + "/04.png").paintIcon(this, g2d, 670 + i * 450,
 					2070);
-			
+
 			g2d.setTransform(at);
 			g2d.setColor(Color.BLACK);
-			g2d.drawString(rozgrywka.waz.get(i).hp + "", (670 + i * 450), 2310);
+			if (rozgrywka.waz.get(i).hp < 0)
+				g2d.drawString("0", (670 + i * 450), 2310);
+			else if (rozgrywka.waz.get(i).hp < 101)
+				g2d.drawString(rozgrywka.waz.get(i).hp + "", (670 + i * 450), 2310);
 			g2d.setColor(Color.GREEN);
 			g2d.drawString(rozgrywka.waz.get(i).punkty + "", 650 + i * 450, 2140);
 			g2d.setColor(Color.RED);
 			g2d.drawString(rozgrywka.waz.get(i).zgony + "", 820 + i * 450, 2140);
 			at.scale(2.5, 2.5);
 		}
-		
+
 		at.scale(skalaSzerokoscMapa, skalaWysokoscMapa);
 		g2d.setTransform(at);
 

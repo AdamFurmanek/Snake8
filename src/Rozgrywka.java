@@ -5,53 +5,54 @@ import java.util.Random;
 public class Rozgrywka {
 
 	Ekran ekran;
-	Okno okno;
 
 	List<Waz> waz;
 	List<Przedmiot> przedmiot;
 
-	int domyslnaSzybkosc=10;
 	int szerokoscMapy, wysokoscMapy;
-	int[] runda;
+
+	int[] runda = new int[3];
+	int domyslnaSzybkosc;
+	boolean czyHp;
+	int[] kolory;
+	String[] pseudonimy;
+	boolean przenikanie, odbijanie;
+
 	int[][] mapa;
 
-	public Rozgrywka(Okno okno, int szerokoscMapy, int wysokoscMapy, int ileGraczy, int ktoraRunda, int ileRund, int czas) {
+	public Rozgrywka(int szerokoscMapy, int wysokoscMapy, int ileGraczy, int ktoraRunda, int ileRund, int czas,
+			int domyslnaSzybkosc, boolean czyHp, int[] kolory, String[] pseudonimy, boolean przenikanie,
+			boolean odbijanie, int[][] mapa) {
 
 		this.szerokoscMapy = szerokoscMapy;
 		this.wysokoscMapy = wysokoscMapy;
-
-		reset(ileGraczy);
-		runda = new int[3];
-		runda[0]=ktoraRunda;
-		runda[1]=ileRund;
-		runda[2]=czas;
+		runda[0] = ktoraRunda;
+		runda[1] = ileRund;
+		runda[2] = czas;
+		this.domyslnaSzybkosc = domyslnaSzybkosc;
+		this.czyHp = czyHp;
+		this.kolory = kolory;
+		this.pseudonimy = pseudonimy;
+		this.przenikanie = przenikanie;
+		this.odbijanie = odbijanie;
+		this.mapa=mapa;
 		
-		ekran = new Ekran(this);
-		this.okno = okno;
-		okno.add(ekran);
-
-		petlaGlowna();
-
-		System.out.println("koniec");
+		reset(ileGraczy);
 	}
 
 	void reset(int ileGraczy) {
 
 		// wygenerowanie losowej mapy
-		Random random = new Random();
-		mapa = new int[wysokoscMapy][szerokoscMapy];
-		for (int i = 0; i < wysokoscMapy; i++)
-			for (int j = 0; j < szerokoscMapy; j++)
-				mapa[i][j] = random.nextInt(10);
+
 
 		waz = new ArrayList<Waz>();
 		for (int i = 0; i < ileGraczy; i++) {
-			waz.add(new Waz(this, i, i));
+			waz.add(new Waz(this, i, kolory[i], pseudonimy[i]));
 			waz.get(i).respawn();
 		}
 	}
 
-	void petlaGlowna() {
+	void petlaGlowna(Ekran ekran) {
 
 		while (true) {
 			try {
@@ -63,8 +64,8 @@ public class Rozgrywka {
 				waz.get(i).licznik();
 			}
 			ekran.repaint();
-			
-			if(runda[2]<=0) {
+
+			if (runda[2] == 0) {
 				break;
 			}
 		}

@@ -15,24 +15,32 @@ public class Waz {
 	int flagaZmianyKierunku = 4;
 	int[] szybkosc;
 	int numer, kolor;
-	int hp = 100, punkty = 0, zgony = 0;
+	int hp, punkty = 0, zgony = 0;
 	// 0 - gora; 1 - lewo; 2 - dol; 3 - prawo; 4 - stop
 	int kierunek;
-	int przenikanie = -1, odbijanie = -1; // -2 ODBIERA 10hp; -1 NIE ROBI NIC; 0 ZABIJA; >0 NIC NIE ROBI PRZEZ PODANY
-											// CZAS
+	int przenikanie, odbijanie; // -2 ODBIERA 10hp; -1 NIE ROBI NIC; 0 ZABIJA; >0 NIC NIE ROBI PRZEZ PODANY
+								// CZAS
 	String pseudonim;
 
-	public Waz(Rozgrywka rozgrywka, int numer, int kolor) {
+	public Waz(Rozgrywka rozgrywka, int numer, int kolor, String pseudonim) {
 
-		pseudonim = new String("Gracz " + numer);
+		this.pseudonim = pseudonim;
 		this.kolor = kolor;
 		this.rozgrywka = rozgrywka;
 		this.numer = numer;
 		cialo = new ArrayList<int[]>();
 		szybkosc = new int[3];
-		szybkosc[0] = 4;
+		szybkosc[0] = rozgrywka.domyslnaSzybkosc;
 		szybkosc[1] = 0;
-		szybkosc[2] = -1;
+		szybkosc[2] = 0;
+		if (rozgrywka.przenikanie)
+			przenikanie = -1;
+		if (rozgrywka.odbijanie)
+			odbijanie = -1;
+		if (rozgrywka.czyHp) {
+			przenikanie = -2;
+			odbijanie = -2;
+		}
 
 	}
 
@@ -45,15 +53,19 @@ public class Waz {
 				if (przenikanie == 0) {
 					// SPRAWDZENIE CZY TO BYLA GLOWA, CZY CIALO OBCEGO WEZA
 					if (kolizja(rozgrywka.waz.get(i).cialo.get(0)[1], rozgrywka.waz.get(i).cialo.get(0)[0])) {
-						if (rozgrywka.waz.get(i).przenikanie == 0)
-							rozgrywka.waz.get(i).flagaSynchronizacjiSmierci = 1;
-						else if (rozgrywka.waz.get(i).przenikanie == -2)
+						if (rozgrywka.waz.get(i).przenikanie == -2)
 							rozgrywka.waz.get(i).hp -= 10;
+						if (rozgrywka.waz.get(i).przenikanie == 0 || rozgrywka.waz.get(i).hp <= 0)
+							rozgrywka.waz.get(i).flagaSynchronizacjiSmierci = 1;
+
 					}
 					flagaSynchronizacjiSmierci = 1;
 					return;
-				} else if (przenikanie == -2)
+				} else if (przenikanie == -2) {
 					hp -= 10;
+					if (hp <= 0)
+						flagaSynchronizacjiSmierci = 1;
+				}
 		}
 
 		// BLOK PRZYSZLEJ KOLIZJI
@@ -93,10 +105,12 @@ public class Waz {
 					flagaZmianyKierunku = 1;
 					kierunek = 1;
 				}
-				if (odbijanie == -2)
+				if (odbijanie == -2) {
 					hp -= 10;
+					if (hp <= 0)
+						flagaSynchronizacjiSmierci = 1;
+				}
 			}
-
 		}
 
 		// WYKONANIE RUCHU
@@ -114,6 +128,7 @@ public class Waz {
 	}
 
 	void smierc() {
+		hp = 0;
 		zgony++;
 		cialo.clear();
 		respawn();
@@ -197,6 +212,12 @@ public class Waz {
 		cialo.get(0)[1] = x1;
 		cialo.get(0)[2] = ulozenieCiala;
 		cialo.get(0)[3] = 4;
+
+		// NIE LICZY SIE HP
+		if (!rozgrywka.czyHp) {
+			hp = 101;
+		} else
+			hp = 100;
 	}
 
 	void licznik() {
@@ -228,10 +249,18 @@ public class Waz {
 		// ODLICZANIE POZOSTALEGO CZASU DLA PRZENIKANIA
 		if (przenikanie > 0)
 			przenikanie--;
+		if (rozgrywka.przenikanie && przenikanie == 0)
+			przenikanie = -1;
+		else if (rozgrywka.czyHp && przenikanie == 0)
+			przenikanie = -2;
 
 		// ODLICZANIE POZOSTALEGO CZASU DLA ODBIJANIA
 		if (odbijanie > 0)
 			odbijanie--;
+		if (rozgrywka.odbijanie && odbijanie == 0)
+			odbijanie = -1;
+		else if (rozgrywka.czyHp && odbijanie == 0)
+			odbijanie = -2;
 
 	}
 
