@@ -21,12 +21,12 @@ public class Okno extends JFrame {
 		ekran = new Ekran(this);
 		add(ekran);
 
-		// kolory,imiona,mapa
+		// kolory,imiona,power-upy,mapa
 		int[] kolory = { 5, 7, 6, 2, 4, 1, 3, 0 };
 		String[] pseudonimy = { "Marek", "Hanka", "Mateusz", "Barbara", "Lucek", "Ula", "Natalka", "Budzyn" };
-
-		int szerokoscMapy = 20;
-		int wysokoscMapy = 8;
+		int[][] moce = {{100,1},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0},{0,0}};
+		int szerokoscMapy = 30;
+		int wysokoscMapy = 14;
 		Random random = new Random();
 		int[][] mapa = new int[wysokoscMapy][szerokoscMapy];
 		for (int i = 0; i < wysokoscMapy; i++)
@@ -35,16 +35,16 @@ public class Okno extends JFrame {
 
 		// URUCHOMIENIE ROZGRYWKI
 		rozgrywka = new Rozgrywka(szerokoscMapy, wysokoscMapy, 8, 7, 15, 5000, 10, true, kolory, pseudonimy, false,
-				false, mapa); // 1 szerokoscMapy; 2 wysokoscMapy; 3 ileGraczy; 4 ktoraRunda; 5 ileRund; 6
+				false, mapa, moce); // 1 szerokoscMapy; 2 wysokoscMapy; 3 ileGraczy; 4 ktoraRunda; 5 ileRund; 6
 								// czas; 7 domyslnaSzybkosc; 8 czyHp; 9 kolory; 10 pseudonimy; 11 przenikanie;
-								// 12 odbijanie;
+								// 12 odbijanie; 13 mapa; 14 moce;
 
 		ekran.rozgrywka = rozgrywka;
 		rozgrywka.petlaGlowna(ekran);
 
 		// DRUGIE URUCHOMIENIE ROZGRYWKI
 		rozgrywka = new Rozgrywka(szerokoscMapy, wysokoscMapy, 8, 7, 15, 500, 10, false, kolory, pseudonimy, false,
-				false, mapa);
+				false, mapa, moce);
 		ekran.rozgrywka = rozgrywka;
 		rozgrywka.petlaGlowna(ekran);
 

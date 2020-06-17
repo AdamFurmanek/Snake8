@@ -81,9 +81,9 @@ public class Ekran extends JPanel implements KeyListener {
 
 			at.scale(0.5, 0.5);
 			g2d.setTransform(at);
-			if (rozgrywka.waz.get(i).przenikanie != 0)
+			if (rozgrywka.waz.get(i).przenikanie != 0 && rozgrywka.waz.get(i).przenikanie != -2)
 				new ImageIcon("images/p/1.png").paintIcon(this, g2d, 1770 + i * 900, 4200);
-			if (rozgrywka.waz.get(i).odbijanie != 0)
+			if (rozgrywka.waz.get(i).odbijanie != 0 && rozgrywka.waz.get(i).odbijanie != -2)
 				new ImageIcon("images/p/4.png").paintIcon(this, g2d, 1770 + i * 900, 4300);
 			if (rozgrywka.waz.get(i).szybkosc[0] > rozgrywka.domyslnaSzybkosc)
 				new ImageIcon("images/p/3.png").paintIcon(this, g2d, 1770 + i * 900, 4400);
