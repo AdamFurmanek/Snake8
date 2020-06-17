@@ -28,7 +28,7 @@ public class Ekran extends JPanel implements KeyListener {
 	public Ekran(Okno okno) {
 
 		addKeyListener(this);
-		setFocusable(true);
+		
 
 		this.okno = okno;
 
@@ -36,6 +36,7 @@ public class Ekran extends JPanel implements KeyListener {
 			public void componentResized(ComponentEvent e) {
 				skalaSzerokoscOkno = (double) okno.getWidth() / 1920;
 				skalaWysokoscOkno = (double) okno.getHeight() / 1080;
+				repaint();
 			}
 		});
 

@@ -159,7 +159,7 @@ class Nozyczki extends Przedmiot {
 
 	@Override
 	void wykonanie(Waz waz, int j) {
-		while(waz.cialo.size()>3)
+		while (waz.cialo.size() > 3)
 			waz.cialo.remove(waz.cialo.size() - 1);
 		waz.cialo.get(waz.cialo.size() - 1)[2] = 4;
 
@@ -179,7 +179,7 @@ class Apteczka extends Przedmiot {
 
 	@Override
 	void wykonanie(Waz waz, int j) {
-		waz.hp=100;
+		waz.hp = 100;
 		instancja.remove(j);
 	}
 
@@ -196,7 +196,7 @@ class Kolce extends Przedmiot {
 
 	@Override
 	void wykonanie(Waz waz, int j) {
-		waz.hp-=30;
+		waz.hp -= 30;
 		instancja.remove(j);
 	}
 
