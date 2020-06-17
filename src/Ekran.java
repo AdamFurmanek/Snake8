@@ -127,6 +127,15 @@ public class Ekran extends JPanel implements KeyListener {
 					new ImageIcon("images/0.png").paintIcon(this, g2d, (int) (94 / (skalaSzerokoscMapa) + j * 200),
 							(int) (77 / (skalaWysokoscMapa) + i * 200));
 
+		// RYSOWANIE PRZEDMIOTOW
+		for (int i = 0; i < rozgrywka.przedmiot.size(); i++) {
+			for (int j = 0; j < rozgrywka.przedmiot.get(i).instancja.size(); j++) {
+				new ImageIcon("images/p/" + rozgrywka.przedmiot.get(i).etykieta + ".png").paintIcon(this, g2d,
+						(int) (94 / (skalaSzerokoscMapa) + rozgrywka.przedmiot.get(i).instancja.get(j)[1] * 200),
+						(int) (77 / (skalaWysokoscMapa) + rozgrywka.przedmiot.get(i).instancja.get(j)[0] * 200));
+			}
+		}
+
 		// RYSOWANIE WEZOW
 		for (int i = 0; i < rozgrywka.waz.size(); i++)
 			for (int j = 0; j < rozgrywka.waz.get(i).cialo.size(); j++)
@@ -135,10 +144,6 @@ public class Ekran extends JPanel implements KeyListener {
 								(int) (94 / (skalaSzerokoscMapa) + rozgrywka.waz.get(i).cialo.get(j)[1] * 200),
 								(int) (77 / (skalaWysokoscMapa) + rozgrywka.waz.get(i).cialo.get(j)[0] * 200));
 
-		// RYSOWANIE PRZEDMIOTOW
-//		for(int i=0;i<rozgrywka.przedmiot.size();i++) {
-//			
-//		}
 	}
 
 	public void keyTyped(KeyEvent e) {

@@ -13,6 +13,7 @@ public class Waz {
 										// (czyli oba powinny umrzec), jeden zostaje usuniety od razu, dzieki czemu
 										// drugi nie widzi ze stal w miejscu z innym wezem i nie wykonuje smierci.
 	int flagaZmianyKierunku = 4;
+	int flagaWydluzeniaCiala = 0;
 	int[] szybkosc;
 	int numer, kolor;
 	int hp, punkty = 0, zgony = 0;
@@ -47,6 +48,7 @@ public class Waz {
 	void krok() {
 
 		// BLOK OBECNEJ KOLIZJI
+		// Z WEZAMI
 		for (int i = 0; i < rozgrywka.waz.size(); i++) {
 			if (i != numer && rozgrywka.waz.get(i).kolizja(cialo.get(0)[1], cialo.get(0)[0]))
 				// BLOK REAKCJI NA UDERZENIE PRZECIWNIKA
@@ -66,6 +68,16 @@ public class Waz {
 					if (hp <= 0)
 						flagaSynchronizacjiSmierci = 1;
 				}
+		}
+
+		// Z PRZEDMIOTAMI
+		for (int i = 0; i < rozgrywka.przedmiot.size(); i++) {
+			for (int j = 0; j < rozgrywka.przedmiot.get(i).instancja.size(); j++) {
+				if (kolizjaGlowy(rozgrywka.przedmiot.get(i).instancja.get(j)[1],
+						rozgrywka.przedmiot.get(i).instancja.get(j)[0])) {
+					rozgrywka.przedmiot.get(i).wykonanie(this, j);
+				}
+			}
 		}
 
 		// BLOK PRZYSZLEJ KOLIZJI
@@ -122,8 +134,12 @@ public class Waz {
 			cialo.get(0)[2] = kierunek;
 			cialo.get(0)[3] = 4;
 
-			cialo.remove(cialo.size() - 1);
-			cialo.get(cialo.size() - 1)[2] = 4;
+			if (flagaWydluzeniaCiala == 1)
+				flagaWydluzeniaCiala = 0;
+			else {
+				cialo.remove(cialo.size() - 1);
+				cialo.get(cialo.size() - 1)[2] = 4;
+			}
 		}
 	}
 
@@ -187,9 +203,13 @@ public class Waz {
 					zajete = true;
 
 			// SPRAWDZENIE KOLIZJI Z PRZEDMIOTAMI
-//			for(int i=0;i<rozgrywka.przedmiot.size();i++) {
-//			
-//			}
+			for (int i = 0; i < rozgrywka.przedmiot.size(); i++) {
+				for (int j = 0; j < rozgrywka.przedmiot.get(i).instancja.size(); j++) {
+					if (kolizja(rozgrywka.przedmiot.get(i).instancja.get(j)[1],
+							rozgrywka.przedmiot.get(i).instancja.get(j)[0]))
+						zajete = true;
+				}
+			}
 		}
 
 		kierunek = 4;

@@ -35,21 +35,22 @@ public class Rozgrywka {
 		this.pseudonimy = pseudonimy;
 		this.przenikanie = przenikanie;
 		this.odbijanie = odbijanie;
-		this.mapa=mapa;
-		
+		this.mapa = mapa;
+
 		reset(ileGraczy);
 	}
 
 	void reset(int ileGraczy) {
 
-		// wygenerowanie losowej mapy
-
-
 		waz = new ArrayList<Waz>();
+		przedmiot = new ArrayList<Przedmiot>();
+
 		for (int i = 0; i < ileGraczy; i++) {
 			waz.add(new Waz(this, i, kolory[i], pseudonimy[i]));
 			waz.get(i).respawn();
 		}
+
+		przedmiot.add(new Serek(this, 100, 5));
 	}
 
 	void petlaGlowna(Ekran ekran) {
@@ -63,6 +64,11 @@ public class Rozgrywka {
 			for (int i = 0; i < waz.size(); i++) {
 				waz.get(i).licznik();
 			}
+
+			for (int i = 0; i < przedmiot.size(); i++) {
+				przedmiot.get(i).respawn();
+			}
+
 			ekran.repaint();
 
 			if (runda[2] == 0) {

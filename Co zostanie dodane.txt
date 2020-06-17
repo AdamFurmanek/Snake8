@@ -1,19 +1,10 @@
-Obiekty bêd¹ trzymane w liœcie. Bêd¹ mia³y pola mówi¹ce o swoich wspo³rzêdnych, ile daj¹ punktów, ile zabieraj¹ hp, jakie daj¹ powerupy, czy znikaj¹ po najechaniu na nie
-
 Mapa bêdzie mia³a strefy respawnu, stefy obiektów, œciany
-
-Œciany bêd¹ mog³y zabieraæ hp
 
 W menu bêdzie mo¿na wybraæ tryb spoœrób przygotowanych w grze, lub wybraæ w³asny podaj¹c zasady gry b¹dŸ je wylosowaæ. Nastêpnie bêdzie mo¿na wybraæ mapê spoœród przygotowanych w grze, lub wylosowaæ na podstawie podanych regu³. Nastêpnie mo¿na wybraæ ile i jakich graczy bierze udzia³ oraz nadaæ graczom lokalnym i komputerowym klawisze sterowania, kolor i pseudonim
 
 Opcje trybu gry: ile rund, jaki czas na rundê, obiekty jakie maj¹ siê pojawiaæ, jak czêsto
 
 Gra bêdzie udŸwiêkowiona
-
-
-
-
-obiekty maja czestotliwosc pojawiania i limit
 
 0. dodaje punkt					(sobie) ¯Ó£TY
 
@@ -22,8 +13,6 @@ obiekty maja czestotliwosc pojawiania i limit
 3. spowolnienie					(sobie/innym/wszystkim) POMARAÑCZOWY
 4. odbijanie od œcian				(sobie/wszystkim) FIOLETOWY
 
-5. uciêcie ogona					(sobie/innym/wszystkim) JASNONIEBIESKI
+5. uciêcie ogona				(sobie/innym/wszystkim) JASNONIEBIESKI
 6. leczenie					(sobie/wszystkim) ZIELONY
 7. zadaje obra¿enia 				(sobie/innym/wszystkim) CZERWONY
-
-- poprawiæ wyœwietlanie wyników na ekran
