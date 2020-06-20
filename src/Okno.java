@@ -20,6 +20,7 @@ public class Okno extends JFrame {
 	MenuMapa menuMapa = new MenuMapa(this);
 	MenuGracze menuGracze = new MenuGracze(this);
 	EkranGry ekranGry = new EkranGry(this);
+	EkranWynik ekranWynik = new EkranWynik(this);
 
 	// ZMIENNE UMOZLIWIAJACE SKALOWANIE OKNA
 	double skalaSzerokoscOkno, skalaWysokoscOkno;
@@ -46,6 +47,7 @@ public class Okno extends JFrame {
 	Random random = new Random();
 	int sterowanie[][] = { { 38, 37, 40, 39 }, { 87, 65, 83, 68 }, { 84, 70, 71, 72 }, { 73, 74, 75, 76 },
 			{ 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
+	boolean startGry = false, koniecGry =false;
 
 	public Okno() {
 		super("Snake8");
@@ -69,13 +71,35 @@ public class Okno extends JFrame {
 		panelGlowny.add(menuMapa, "menuMapa");
 		panelGlowny.add(menuGracze, "menuGracze");
 		panelGlowny.add(ekranGry, "ekranGry");
+		panelGlowny.add(ekranWynik, "ekranWynik");
 
-		iloscRund = 10;
-		for (aktualnaRunda = 1; aktualnaRunda < iloscRund + 1; aktualnaRunda++)
-			rozgrywka();
-//		while(true) {
-//			
-//		}
+		iloscRund = 2;
+
+		while (true) {
+			try {
+				Thread.sleep(100);
+			} catch (Exception ex) {
+			}
+			if (startGry) {
+				startGry=false;
+				koniecGry=false;
+				for (aktualnaRunda = 1; aktualnaRunda < iloscRund + 1; aktualnaRunda++) {
+					zakladki.show(panelGlowny, "ekranGry");
+					ekranGry.requestFocusInWindow();
+					rozgrywka();
+					zakladki.show(panelGlowny, "ekranWynik");
+					ekranWynik.requestFocusInWindow();
+					try {
+						Thread.sleep(2000);
+					} catch (Exception ex) {
+					}
+					if(koniecGry)
+						break;
+				}
+				zakladki.show(panelGlowny, "menuStart");
+				menuStart.requestFocusInWindow();
+			}
+		}
 
 	}
 
@@ -87,10 +111,10 @@ public class Okno extends JFrame {
 			parametryPrzedmiotow[i][0] = 0;
 			parametryPrzedmiotow[i][1] = 0;
 		}
-		parametryPrzedmiotow[0][0] = 100;
-		parametryPrzedmiotow[0][1] = 1;
-		parametryPrzedmiotow[1][0] = 100;
-		parametryPrzedmiotow[1][1] = 1;
+		parametryPrzedmiotow[0][0] = 10;
+		parametryPrzedmiotow[0][1] = 50;
+//		parametryPrzedmiotow[1][0] = 100;
+//		parametryPrzedmiotow[1][1] = 1;
 		szerokoscMapy = 30;
 		wysokoscMapy = 14;
 
@@ -98,15 +122,15 @@ public class Okno extends JFrame {
 		for (int i = 0; i < wysokoscMapy; i++)
 			for (int j = 0; j < szerokoscMapy; j++)
 				mapa[i][j] = random.nextInt(10);
-		ileGraczy = 4;
+		ileGraczy = 1;
 		domyslnaSzybkosc = 10;
 		wlaczHP = true;
-		stalePrzenikanie = false;
-		staleOdbijanie = false;
+		stalePrzenikanie = true;
+		staleOdbijanie = true;
 		stalePrzechodzenie = false;
 		zostawianieCiala = true;
-		dlugoscRundy = 5000;
-		pozostalyCzas = 5000;
+		dlugoscRundy = 500;
+		pozostalyCzas = 500;
 
 		// ^^^ LOSOWE ^^^
 
@@ -136,7 +160,7 @@ public class Okno extends JFrame {
 		przedmiot.add(new Kolce(this, parametryPrzedmiotow[7][0], parametryPrzedmiotow[7][1])); // nie moga sie pojawic
 																								// jesli gra bez hp
 		rundaTrwa = true;
-		while (rundaTrwa) {
+		while (rundaTrwa&&!koniecGry) {
 			try {
 				Thread.sleep(20);
 			} catch (InterruptedException e) {

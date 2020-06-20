@@ -1,11 +1,11 @@
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 
-public class MenuGracze extends Ekran {
+public class EkranWynik extends Ekran {
 
 	Okno okno;
 
-	public MenuGracze(Okno okno) {
+	public EkranWynik(Okno okno) {
 		this.okno = okno;
 		addMouseListener(this);
 		addMouseMotionListener(this);
@@ -14,10 +14,10 @@ public class MenuGracze extends Ekran {
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		okno.startGry = true;
+
 	}
 
 	public void keyPressed(KeyEvent e) {
-		System.out.println("MG " + e.getKeyChar());
+		System.out.println("EW " + e.getKeyChar());
 	}
 }

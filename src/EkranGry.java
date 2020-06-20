@@ -1,4 +1,5 @@
 import java.awt.Color;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -166,8 +167,7 @@ public class EkranGry extends Ekran {
 	}
 
 	public void mouseReleased(MouseEvent e) {
-		okno.zakladki.show(okno.panelGlowny, "menuStart");
-		okno.menuStart.requestFocusInWindow();
+		okno.koniecGry=true;
 	}
 
 	public void keyPressed(KeyEvent e) {
