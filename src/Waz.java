@@ -1,86 +1,83 @@
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class Waz {
 
-	Rozgrywka rozgrywka;
-
-	List<int[]> cialo;
-
-	int flagaSynchronizacjiSmierci = 0; // Flaga potrzebna do wykonania smierci weza, dopiero po przejsciu licznika dla
-										// wszystkich wezow. Zapobiega to sytuacji w ktorej gdy dwa weze uderza czolowo
-										// (czyli oba powinny umrzec), jeden zostaje usuniety od razu, dzieki czemu
-										// drugi nie widzi ze stal w miejscu z innym wezem i nie wykonuje smierci.
-	int flagaZmianyKierunku = 4;
-	int flagaWydluzeniaCiala = 0;
-	int[] szybkosc;
-	int numer, kolor;
-	int hp, punkty = 0, zgony = 0;
-	// 0 - gora; 1 - lewo; 2 - dol; 3 - prawo; 4 - stop
-	int kierunek;
-	int przenikanie, odbijanie; // -2 ODBIERA 10hp; -1 NIE ROBI NIC; 0 ZABIJA; >0 NIC NIE ROBI PRZEZ PODANY
-								// CZAS
+	Okno okno;
+	List<int[]> cialo = new ArrayList<int[]>();
 	String pseudonim;
+	int numer, kolor;
+	int kierunek, wydluzenieCiala;
+	int hp = 0, punkty = 0, zgony = 0;
+	int[] szybkosc = { 0, 0, 0 }; // 0 szybkosc; 1 licznik 2; czas mocy
+	int przenikanie = 0, odbijanie = 0, przechodzenie = 0;
 
-	public Waz(Rozgrywka rozgrywka, int numer, int kolor, String pseudonim) {
-
-		this.pseudonim = pseudonim;
-		this.kolor = kolor;
-		this.rozgrywka = rozgrywka;
+	public Waz(Okno okno, int numer, int kolor, String pseudonim) {
+		this.okno = okno;
 		this.numer = numer;
-		cialo = new ArrayList<int[]>();
-		szybkosc = new int[3];
-		szybkosc[0] = rozgrywka.domyslnaSzybkosc;
-		szybkosc[1] = 0;
-		szybkosc[2] = 0;
-		if (rozgrywka.przenikanie)
-			przenikanie = -1;
-		if (rozgrywka.odbijanie)
-			odbijanie = -1;
-		if (rozgrywka.czyHp) {
-			przenikanie = -2;
-			odbijanie = -2;
+		this.kolor = kolor;
+		this.pseudonim = pseudonim;
+		szybkosc[0] = okno.domyslnaSzybkosc;
+	}
+
+	void takt() {
+
+		// WYKONANIE RUCHU CO OKRESLONY SKOK CZASU (SZYBKOSC)
+		szybkosc[1]++;
+		if (szybkosc[0] <= szybkosc[1]) {
+			szybkosc[1] = 0;
+			krok();
 		}
 
+		// ODLICZANIE POZOSTALEGO CZASU DLA SPOWONIENIA/PRZYSPIESZENIA
+		if (szybkosc[2] == 0)
+			szybkosc[0] = okno.domyslnaSzybkosc;
+		else if (szybkosc[2] > 0)
+			szybkosc[2]--;
+
+		// ODLICZANIE POZOSTALEGO CZASU DLA PRZENIKANIA
+		if (przenikanie > 0)
+			przenikanie--;
+
+		// ODLICZANIE POZOSTALEGO CZASU DLA ODBIJANIA
+		if (odbijanie > 0)
+			odbijanie--;
+		
+		// ODLICZANIE POZOSTALEGO CZASU DLA PRZECHODZENIA
+		if (przechodzenie > 0)
+			przechodzenie--;
 	}
 
 	void krok() {
 
-		// BLOK OBECNEJ KOLIZJI
-		// Z WEZAMI
-		for (int i = 0; i < rozgrywka.waz.size(); i++) {
-			if (i != numer && rozgrywka.waz.get(i).kolizja(cialo.get(0)[1], cialo.get(0)[0]))
-				// BLOK REAKCJI NA UDERZENIE PRZECIWNIKA
-				if (przenikanie == 0) {
-					// SPRAWDZENIE CZY TO BYLA GLOWA, CZY CIALO OBCEGO WEZA
-					if (kolizja(rozgrywka.waz.get(i).cialo.get(0)[1], rozgrywka.waz.get(i).cialo.get(0)[0])) {
-						if (rozgrywka.waz.get(i).przenikanie == -2)
-							rozgrywka.waz.get(i).hp -= 10;
-						if (rozgrywka.waz.get(i).przenikanie == 0 || rozgrywka.waz.get(i).hp <= 0)
-							rozgrywka.waz.get(i).flagaSynchronizacjiSmierci = 1;
-
+		// KOLIZJA Z WEZAMI
+		for (int i = 0; i < okno.waz.size(); i++) {
+			if (i == numer && kolizja() || i != numer && okno.waz.get(i).kolizja(this)) {
+				if (!okno.stalePrzenikanie && przenikanie <= 0) {
+					if (okno.wlaczHP) {
+						hp -= 20;
+						if (hp <= 0) {
+							smierc();
+							return;
+						}
+					} else {
+						smierc();
+						return;
 					}
-					flagaSynchronizacjiSmierci = 1;
-					return;
-				} else if (przenikanie == -2) {
-					hp -= 10;
-					if (hp <= 0)
-						flagaSynchronizacjiSmierci = 1;
-				}
-		}
-
-		// Z PRZEDMIOTAMI
-		for (int i = 0; i < rozgrywka.przedmiot.size(); i++) {
-			for (int j = 0; j < rozgrywka.przedmiot.get(i).instancja.size(); j++) {
-				if (kolizjaGlowy(rozgrywka.przedmiot.get(i).instancja.get(j)[1],
-						rozgrywka.przedmiot.get(i).instancja.get(j)[0])) {
-					rozgrywka.przedmiot.get(i).wykonanie(this, j);
 				}
 			}
 		}
 
-		// BLOK PRZYSZLEJ KOLIZJI
+		// KONTAKT Z PRZEDMIOTAMI
+		for (int i = 0; i < okno.przedmiot.size(); i++) {
+			for (int j = 0; j < okno.przedmiot.get(i).instancja.size(); j++) {
+				if (kolizja(okno.przedmiot.get(i).instancja.get(j)[0], okno.przedmiot.get(i).instancja.get(j)[1])) {
+					okno.przedmiot.get(i).wykonanie(this, j);
+				}
+			}
+		}
+
+		// OBLICZENIE KOLEJNEGO POLA
 		int x = cialo.get(0)[1], y = cialo.get(0)[0];
 
 		cialo.get(0)[3] = kierunek;
@@ -98,35 +95,51 @@ public class Waz {
 			x++;
 			break;
 		}
-		if (x < 0 || y < 0 || x >= rozgrywka.szerokoscMapy || y >= rozgrywka.wysokoscMapy
-				|| rozgrywka.mapa[y][x] == 1) {
-			if (odbijanie == 0) {
-				flagaSynchronizacjiSmierci = 1;
-				return;
-			} else {
-				if (kierunek == 0) {
-					flagaZmianyKierunku = 2;
-					kierunek = 2;
-				} else if (kierunek == 2) {
-					flagaZmianyKierunku = 0;
-					kierunek = 0;
-				} else if (kierunek == 1) {
-					flagaZmianyKierunku = 3;
-					kierunek = 3;
-				} else if (kierunek == 3) {
-					flagaZmianyKierunku = 1;
-					kierunek = 1;
-				}
-				if (odbijanie == -2) {
-					hp -= 10;
-					if (hp <= 0)
-						flagaSynchronizacjiSmierci = 1;
-				}
-			}
-		}
 
-		// WYKONANIE RUCHU
-		else if (kierunek != 4) {
+		// SPRAWDZENIE CZY WCHODZI NA SCIANE
+		if (x < 0 || y < 0 || x >= okno.szerokoscMapy || y >= okno.wysokoscMapy || okno.mapa[y][x] == 1) {
+
+			// WAZ PRZEJDZIE JESLI MA WLACZONE PRZECHODZENIE
+			if (okno.stalePrzechodzenie || przechodzenie > 0) {
+				if (x < 0)
+					x = okno.szerokoscMapy - 1;
+				else if (x >= okno.szerokoscMapy)
+					x = 0;
+				else if (y < 0)
+					y = okno.wysokoscMapy - 1;
+				else if (y >= okno.wysokoscMapy)
+					y = 0;
+			} 
+			// WAZ SIE ODBIJE JESLI MA WLACZONE ODBICIE LUB HP JEST WLACZONE
+			else if (okno.staleOdbijanie || odbijanie > 0 || okno.wlaczHP) {
+				if (kierunek == 0)
+					kierunek = 2;
+				else if (kierunek == 2)
+					kierunek = 0;
+				else if (kierunek == 1)
+					kierunek = 3;
+				else if (kierunek == 3)
+					kierunek = 1;
+				//ZABIERA HP JESLI WLACZONE
+				if (okno.wlaczHP && !okno.staleOdbijanie && odbijanie == 0) {
+					hp -= 20;
+					if (hp <= 0) {
+						smierc();
+						return;
+					}
+				}
+				return;
+			}
+
+			// WAZ UMRZE JESLI SIE NIE ODBIJA ANI NIE PRZECHODZI
+			else {
+				smierc();
+				return;
+			}
+
+		}
+		//WYKONANIE RUCHU
+		if (kierunek != 4) {
 
 			cialo.add(0, new int[4]);
 			cialo.get(0)[0] = y;
@@ -134,8 +147,8 @@ public class Waz {
 			cialo.get(0)[2] = kierunek;
 			cialo.get(0)[3] = 4;
 
-			if (flagaWydluzeniaCiala == 1)
-				flagaWydluzeniaCiala = 0;
+			if (wydluzenieCiala > 0)
+				wydluzenieCiala--;
 			else {
 				cialo.remove(cialo.size() - 1);
 				cialo.get(cialo.size() - 1)[2] = 4;
@@ -143,30 +156,23 @@ public class Waz {
 		}
 	}
 
-	void smierc() {
-		hp = 0;
-		zgony++;
-		cialo.clear();
-		respawn();
-	}
-
 	void respawn() {
-		Random random = new Random();
 		int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
-		boolean zajete = true;
 		int ulozenieCiala = 0;
+		boolean zajete = true;
 
+		// SZUKANIE WOLNEGO MIEJSCA NA MAPIE
 		while (zajete) {
 			// WYLOSOWANIE WSPOLRZEDNYCH GLOWKI WEZA
-			x1 = random.nextInt(rozgrywka.szerokoscMapy);
-			y1 = random.nextInt(rozgrywka.wysokoscMapy);
+			x1 = okno.random.nextInt(okno.szerokoscMapy);
+			y1 = okno.random.nextInt(okno.wysokoscMapy);
 			x2 = x1;
 			y2 = y1;
 			x3 = x1;
 			y3 = y1;
 
 			// WYLOSOWANIE KIERUNKU CIALA WEZA
-			ulozenieCiala = random.nextInt(4);
+			ulozenieCiala = okno.random.nextInt(4);
 			switch (ulozenieCiala) {
 			case 0:
 				y2 = y1 + 1;
@@ -189,31 +195,29 @@ public class Waz {
 			zajete = false;
 
 			// SPRAWDZENIE GRANIC
-			if (x3 < 0 || y3 < 0 || x3 >= rozgrywka.szerokoscMapy || y3 >= rozgrywka.wysokoscMapy)
+			if (x3 < 0 || y3 < 0 || x3 >= okno.szerokoscMapy || y3 >= okno.wysokoscMapy)
 				zajete = true;
 
 			// SPRAWDZENIE SCIAN NA MAPIE
-			else if (rozgrywka.mapa[y1][x1] == 1 || rozgrywka.mapa[y2][x2] == 1 || rozgrywka.mapa[y3][x3] == 1)
+			else if (okno.mapa[y1][x1] == 1 || okno.mapa[y2][x2] == 1 || okno.mapa[y3][x3] == 1)
 				zajete = true;
 
 			// SPRAWDZENIE KOLIZJI Z INNYMI WEZAMI
-			for (int i = 0; i < rozgrywka.waz.size(); i++)
-				if (rozgrywka.waz.get(i).kolizja(x1, y1) || rozgrywka.waz.get(i).kolizja(x2, y2)
-						|| rozgrywka.waz.get(i).kolizja(x3, y3))
+			for (int i = 0; i < okno.waz.size(); i++)
+				if (okno.waz.get(i).kolizja(y1, x1) || okno.waz.get(i).kolizja(y2, x2)
+						|| okno.waz.get(i).kolizja(y3, x3))
 					zajete = true;
 
 			// SPRAWDZENIE KOLIZJI Z PRZEDMIOTAMI
-			for (int i = 0; i < rozgrywka.przedmiot.size(); i++) {
-				for (int j = 0; j < rozgrywka.przedmiot.get(i).instancja.size(); j++) {
-					if (kolizja(rozgrywka.przedmiot.get(i).instancja.get(j)[1],
-							rozgrywka.przedmiot.get(i).instancja.get(j)[0]))
+			for (int i = 0; i < okno.przedmiot.size(); i++) {
+				for (int j = 0; j < okno.przedmiot.get(i).instancja.size(); j++) {
+					if (kolizja(okno.przedmiot.get(i).instancja.get(j)[0], okno.przedmiot.get(i).instancja.get(j)[1]))
 						zajete = true;
 				}
 			}
 		}
 
 		kierunek = 4;
-		flagaZmianyKierunku = 4;
 
 		cialo.add(0, new int[4]);
 		cialo.get(0)[0] = y3;
@@ -233,67 +237,71 @@ public class Waz {
 		cialo.get(0)[2] = ulozenieCiala;
 		cialo.get(0)[3] = 4;
 
-		// NIE LICZY SIE HP
-		if (!rozgrywka.czyHp) {
-			hp = 101;
-		} else
-			hp = 100;
-	}
-
-	void licznik() {
-
-		// WYKONANIE ZAMOWIONEJ SMIERCI PRZEZ FLAGE
-		if (flagaSynchronizacjiSmierci == 1) {
-			flagaSynchronizacjiSmierci = 0;
-			smierc();
-			return;
-		}
-
-		// WYKONANIE RUCHU CO OKRESLONY SKOK CZASU (SZYBKOSC)
-		szybkosc[1]++;
-		if (szybkosc[0] <= szybkosc[1]) {
-			// WYKONANIE ZAMOWIONEJ ZMIANY KIERUNKU
-			if (flagaZmianyKierunku != 4 && (kierunek == 4 || przenikanie != 0
-					|| (kierunek != flagaZmianyKierunku + 2 && kierunek + 2 != flagaZmianyKierunku)))
-				kierunek = flagaZmianyKierunku;
-			szybkosc[1] = 0;
-			krok();
-		}
-
-		// ODLICZANIE POZOSTALEGO CZASU DLA SPOWONIENIA/PRZYSPIESZENIA
-		if (szybkosc[2] == 0)
-			szybkosc[0] = rozgrywka.domyslnaSzybkosc;
-		else if (szybkosc[2] > 0)
-			szybkosc[2]--;
-
-		// ODLICZANIE POZOSTALEGO CZASU DLA PRZENIKANIA
-		if (przenikanie > 0)
-			przenikanie--;
-		if (rozgrywka.przenikanie && przenikanie == 0)
-			przenikanie = -1;
-		else if (rozgrywka.czyHp && przenikanie == 0)
-			przenikanie = -2;
-
-		// ODLICZANIE POZOSTALEGO CZASU DLA ODBIJANIA
-		if (odbijanie > 0)
-			odbijanie--;
-		if (rozgrywka.odbijanie && odbijanie == 0)
-			odbijanie = -1;
-		else if (rozgrywka.czyHp && odbijanie == 0)
-			odbijanie = -2;
+		hp = 100;
 
 	}
 
-	boolean kolizja(int x, int y) {
+	void smierc() {
+		hp = 0;
+		zgony++;
+		if(okno.limitZgonow>zgony||okno.limitZgonow==0) {
+			cialo.clear();
+			respawn();
+		}
+		else if(!okno.zostawianieCiala)
+			cialo.clear();
+	}
+
+	// SPRAWDZENIE KOLIZJI WYWOLANE PRZEZ OBCEGO WEZA
+	boolean kolizja(Waz waz) {
+
+		// JESLI ZDERZYL SIE Z GLOWA
+		
+		if (cialo.get(0)[0] == waz.cialo.get(0)[0] && cialo.get(0)[1] == waz.cialo.get(0)[1]) {
+			if (!okno.stalePrzenikanie && przenikanie <= 0) {
+				if (okno.wlaczHP) {
+					hp -= 20;
+					if (hp <= 0) {
+						smierc();
+					}
+				} else {
+					smierc();
+				}
+			}
+			return true;
+		}
+
+		// JESLI ZDERZYL SIE Z CIALEM
+		for (int i = 1; i < cialo.size(); i++)
+			if (cialo.get(i)[0] == waz.cialo.get(0)[0] && cialo.get(i)[1] == waz.cialo.get(0)[1])
+				return true;
+
+		// JESLI SIE NIE ZDERZYL
+		return false;
+	}
+
+	// SPRAWDZENIE KOLIZJI Z WLASNYM CIALEM
+	boolean kolizja() {
+
+		// JESLI DOSZLO DO ZDERZENIA
+		for (int i = 1; i < cialo.size(); i++)
+			if (cialo.get(i)[0] == cialo.get(0)[0] && cialo.get(i)[1] == cialo.get(0)[1])
+				return true;
+
+		// JESLI NIE DOSZLO DO ZDERZENIA
+		return false;
+	}
+
+	// SPRAWDZENIE CZY ZAJMUJE PODANE WSPOLRZEDNE
+	boolean kolizja(int y, int x) {
+
+		// JESLI ZAJMUJE
 		for (int i = 0; i < cialo.size(); i++)
 			if (cialo.get(i)[0] == y && cialo.get(i)[1] == x)
 				return true;
+
+		// JESLI NIE ZAJMUJE
 		return false;
 	}
 
-	boolean kolizjaGlowy(int x, int y) {
-		if (cialo.get(0)[0] == y && cialo.get(0)[1] == x)
-			return true;
-		return false;
-	}
 }
