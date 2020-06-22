@@ -8,7 +8,7 @@ public class Waz {
 	String pseudonim;
 	int numer, kolor;
 	int kierunek, wydluzenieCiala;
-	int hp = 0, punkty = 0, zgony = 0;
+	int hp = 100, punkty = 0, zgony = 0;
 	int[] szybkosc = { 0, 0, 0 }; // 0 szybkosc; 1 licznik 2; czas mocy
 	int przenikanie = 0, odbijanie = 0, przechodzenie = 0;
 

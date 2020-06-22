@@ -51,15 +51,15 @@ public class Okno extends JFrame {
 
 	public Okno() {
 		super("Snake8");
-		setSize(1286, 743);
+		setSize(1297, 760);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
 		setLocationRelativeTo(null);
 
 		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
-				skalaSzerokoscOkno = (double) getWidth() / 1920;
-				skalaWysokoscOkno = (double) getHeight() / 1080;
+				skalaSzerokoscOkno = (double) (getWidth()-16) / 1920;
+				skalaWysokoscOkno = (double) (getHeight()-39) / 1080;
 			}
 		});
 
@@ -73,7 +73,7 @@ public class Okno extends JFrame {
 		panelGlowny.add(ekranGry, "ekranGry");
 		panelGlowny.add(ekranWynik, "ekranWynik");
 
-		iloscRund = 2;
+		iloscRund = 12;
 
 		while (true) {
 			try {
@@ -106,8 +106,8 @@ public class Okno extends JFrame {
 	void rozgrywka() {
 
 		for (int i = 0; i < 8; i++) {
-			kolory[i] = i;
-			pseudonimy[i] = new String("Gracz");
+			kolory[i] = i+2;
+			pseudonimy[i] = new String("Gracz "+i);
 			parametryPrzedmiotow[i][0] = 0;
 			parametryPrzedmiotow[i][1] = 0;
 		}
@@ -122,15 +122,15 @@ public class Okno extends JFrame {
 		for (int i = 0; i < wysokoscMapy; i++)
 			for (int j = 0; j < szerokoscMapy; j++)
 				mapa[i][j] = random.nextInt(10);
-		ileGraczy = 1;
+		ileGraczy = 8;
 		domyslnaSzybkosc = 10;
 		wlaczHP = true;
 		stalePrzenikanie = true;
 		staleOdbijanie = true;
 		stalePrzechodzenie = false;
 		zostawianieCiala = true;
-		dlugoscRundy = 500;
-		pozostalyCzas = 500;
+		dlugoscRundy = 3000;
+		pozostalyCzas = 3000;
 
 		// ^^^ LOSOWE ^^^
 
