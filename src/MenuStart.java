@@ -23,6 +23,7 @@ public class MenuStart extends Ekran {
 		if(klawisz==1) {
 			okno.zakladki.show(okno.panelGlowny, "menuTryb");
 			okno.menuTryb.requestFocusInWindow();
+			okno.menuTryb.pobierzTryb();
 		}
 	}
 

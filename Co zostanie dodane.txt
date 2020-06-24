@@ -17,36 +17,13 @@ Gra bêdzie udŸwiêkowiona
 6. leczenie					(sobie/wszystkim) ZIELONY
 7. zadaje obra¿enia 				(sobie/innym/wszystkim) CZERWONY
 
-Tryby autorskie:
-
-
-- TREASURE HUNT CLASSIC (NO HP, NO POWER-UPS) (0) (DO TRZECH SMIERCI)
-- TREASURE HUNT GHOSTS (HP) (0,2,3) (ODBIJANIE, PRZENIKANIE) 
-- TREASURE HUNT RUSH - EASY (NO HP, POWER-UPS) (0) (STALE ODBIJANIE, STALE PRZENIKANIE)
-- TREASURE HUNT RUSH - POWERS (NO HP, POWER-UPS) (0,1,2,3,4,5)
-- TREASURE HUNT RUSH - HP (HP, NO POWER-UPS) (0,6,7)
-- TREASURE HUNT RUSH - POWERS (HP, POWER-UPS) (0,1,2,3,4,5,6,7)
-- RAINBOW TREASURE HUNT (HP, POWER-UPS) (0,1,2,3,4,5,6,7) (DUZO WSZYSTKIEGO)
-
-- 1 LIFE TREASURE HUNT CLASSIC (NO HP, NO POWER-UPS) (0)
-- 1 LIFE TREASURE HUNT POWERS(NO HP, POWER-UPS) (1,2,3,4,5)
-
-- DEATH MATCH CLASSIC(NO HP, NO POWER-UPS) (0)
-- DEATH MATCH HP(HP, NO POWER-UPS) (0,6,7)
-- POWER DEATH MATCH (NO HP, POWER-UPS) (0,1,2,3,4)
-- POWER DEATH MATCH HP(HP, POWER-UPS) (0,1,2,3,4,5,6)
-- GOLD DEATH MATCH (NO HP, NO POWER-UPS) (0) (MNOSTWO SERKOW DOOKOLA)
-- BRUTAL DEATH MATCH (NO HP, NO POWER-UPS) (7) (MNOSTWO KOLCOW DOOKOLA)
-- SPEED DEATH MATCH (NO HP, NO POWER-UPS) (0, 2) (MNOSTWO PRZYSPIESZEN DOOKOLA)
-- RAINBOW DEATH MECZ (HP, POWER-UPS) (0,1,2,3,4,5,6,7) (DUZO WSZYSTKIEGO)
-
 start
 - dalej
 tryb
 - dalej
 - wstecz
 - przewijanie domyœlnych trybów
-- parametry do ustawienia pod spodem
+- parametry do ustawienia pod spodem (1. hp;   2. przenikanie   3. odbijanie   4. przechodzenie   5. zostawianie ciala   6. warunek   7. wartosc warunku   8. ile rund   9. domyslna szybkosc   10. przedmioty)
 mapa
 - dalej
 - wstecz

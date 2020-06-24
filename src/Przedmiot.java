@@ -16,7 +16,9 @@ public class Przedmiot {
 			if (instancja.size() < limit) {
 				int x = 0, y = 0;
 				boolean zajete = true;
-				while (zajete) {
+				int proba = 0;
+				while (zajete && proba < 50) {
+					proba++;
 					x = okno.random.nextInt(okno.szerokoscMapy);
 					y = okno.random.nextInt(okno.wysokoscMapy);
 
@@ -44,14 +46,17 @@ public class Przedmiot {
 						}
 					}
 				}
-				instancja.add(0, new int[2]);
-				instancja.get(0)[0] = y;
-				instancja.get(0)[1] = x;
+				if (proba < 50) {
+					instancja.add(0, new int[2]);
+					instancja.get(0)[0] = y;
+					instancja.get(0)[1] = x;
+				}
 			}
 		}
 	}
 
-	void wykonanie(Waz waz, int j){}
+	void wykonanie(Waz waz, int j) {
+	}
 }
 
 class Serek extends Przedmiot {
@@ -179,8 +184,8 @@ class Kolce extends Przedmiot {
 
 	void wykonanie(Waz waz, int j) {
 		waz.hp -= 30;
-		if (waz.hp < 0)
-			waz.hp = 0;
+		if (waz.hp <= 0)
+			waz.smierc();
 		instancja.remove(j);
 	}
 }

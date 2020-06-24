@@ -64,20 +64,20 @@ public class EkranGry extends Ekran {
 		else if(okno.limitPunktow>0) {
 			g2d.setColor(new Color(39, 174, 96));
 			if(okno.limitPunktow<10)
-				g2d.drawString(okno.limitPunktow + "", 1707, 935);
+				g2d.drawString(okno.limitPunktow + "", 1756, 935);
 			else if(okno.limitPunktow>99)
-				g2d.drawString(okno.limitPunktow + "", 1677, 935);
+				g2d.drawString(okno.limitPunktow + "", 1718, 935);
 			else
-				g2d.drawString(okno.limitPunktow + "", 1691, 935);
+				g2d.drawString(okno.limitPunktow + "", 1737, 935);
 		}
 		else if(okno.limitZgonow>0) {
 			g2d.setColor(new Color(231, 76, 60));
 			if(okno.limitZgonow<10)
-				g2d.drawString(okno.limitZgonow + "", 1707, 935);
+				g2d.drawString(okno.limitZgonow + "", 1756, 935);
 			else if(okno.limitZgonow>99)
-				g2d.drawString(okno.limitZgonow + "", 1677, 935);
+				g2d.drawString(okno.limitZgonow + "", 1718, 935);
 			else
-				g2d.drawString(okno.limitZgonow + "", 1691, 935);
+				g2d.drawString(okno.limitZgonow + "", 1737, 935);
 		}
 
 		// RYSOWANIE PANELU Z WYNIKAMI
@@ -92,10 +92,10 @@ public class EkranGry extends Ekran {
 				new ImageIcon("images/p/2.png").paintIcon(this, g2d, 1720 + i * 910, 4660);
 			if (okno.waz.get(i).przenikanie > 0 || okno.stalePrzenikanie)
 				new ImageIcon("images/p/1.png").paintIcon(this, g2d, 1510 + i * 910, 4660);
-			if (okno.waz.get(i).odbijanie > 0 || okno.staleOdbijanie)
-				new ImageIcon("images/p/4.png").paintIcon(this, g2d, 1300 + i * 910, 4660);
-			else if (okno.waz.get(i).przechodzenie > 0 || okno.stalePrzechodzenie)
+			if (okno.waz.get(i).przechodzenie > 0 || okno.stalePrzechodzenie)
 				new ImageIcon("images/p/8.png").paintIcon(this, g2d, 1300 + i * 910, 4660);
+			else if (okno.waz.get(i).odbijanie > 0 || okno.staleOdbijanie)
+				new ImageIcon("images/p/4.png").paintIcon(this, g2d, 1300 + i * 910, 4660);
 
 			// RYSOWANIE GLOW WEZOW
 			at.scale(2, 2);
@@ -176,7 +176,7 @@ public class EkranGry extends Ekran {
 	public void keyPressed(KeyEvent e) {
 		for (int i = 0; i < 8; i++)
 			for (int j = 0; j < 4; j++)
-				if (e.getKeyCode() == okno.sterowanie[i][j]) {
+				if (e.getKeyCode() == okno.sterowanie[i][j]&&(okno.waz.get(i).zgony<okno.limitZgonow||okno.limitZgonow==0)) {
 					if (okno.stalePrzenikanie || okno.waz.get(i).przenikanie > 0
 							|| j != okno.waz.get(i).cialo.get(0)[2] + 2 && j != okno.waz.get(i).cialo.get(0)[2] - 2)
 						okno.waz.get(i).kierunek = j;

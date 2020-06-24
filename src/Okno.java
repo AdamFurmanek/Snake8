@@ -29,25 +29,22 @@ public class Okno extends JFrame {
 	List<Waz> waz = new ArrayList<Waz>();
 	List<Przedmiot> przedmiot = new ArrayList<Przedmiot>();
 	int szerokoscMapy, wysokoscMapy;
-	int[][] parametryPrzedmiotow = new int[8][8];
-	int warunekKonca[][] = new int[3][1]; // 0 czas; //1 smierci; //2 punkty;
+	int[][] parametryPrzedmiotow = new int[9][2];
 	int[][] mapa;
-	int[][] przedmioty;
 	int[] kolory = new int[8];
 	String[] pseudonimy = new String[8];
+	int warunekKonca;
 	int aktualnaRunda, iloscRund, dlugoscRundy, pozostalyCzas;
-	int limitZgonow = 0, limitPunktow = 0;
-	boolean rundaTrwa;
+	int limitZgonow, limitPunktow;
 	int domyslnaSzybkosc;
-	boolean zostawianieCiala;
-	boolean wlaczHP, stalePrzenikanie, staleOdbijanie, stalePrzechodzenie, stalaSmierc;
+	boolean wlaczHP, stalePrzenikanie, staleOdbijanie, stalePrzechodzenie, zostawianieCiala;
 
 	// TECHNICZNE
 	int ileGraczy;
 	Random random = new Random();
 	int sterowanie[][] = { { 38, 37, 40, 39 }, { 87, 65, 83, 68 }, { 84, 70, 71, 72 }, { 73, 74, 75, 76 },
 			{ 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 } };
-	boolean startGry = false, koniecGry =false;
+	boolean startGry = false, koniecGry = false, rundaTrwa;
 
 	public Okno() {
 		super("Snake8");
@@ -58,8 +55,8 @@ public class Okno extends JFrame {
 
 		addComponentListener(new ComponentAdapter() {
 			public void componentResized(ComponentEvent e) {
-				skalaSzerokoscOkno = (double) (getWidth()-16) / 1920;
-				skalaWysokoscOkno = (double) (getHeight()-39) / 1080;
+				skalaSzerokoscOkno = (double) (getWidth() - 16) / 1920;
+				skalaWysokoscOkno = (double) (getHeight() - 39) / 1080;
 			}
 		});
 
@@ -73,19 +70,18 @@ public class Okno extends JFrame {
 		panelGlowny.add(ekranGry, "ekranGry");
 		panelGlowny.add(ekranWynik, "ekranWynik");
 
-		iloscRund = 12;
-
 		while (true) {
 			try {
 				Thread.sleep(100);
 			} catch (Exception ex) {
 			}
 			if (startGry) {
-				startGry=false;
-				koniecGry=false;
+				startGry = false;
+				koniecGry = false;
 				for (aktualnaRunda = 1; aktualnaRunda < iloscRund + 1; aktualnaRunda++) {
 					zakladki.show(panelGlowny, "ekranGry");
 					ekranGry.requestFocusInWindow();
+					pozostalyCzas=dlugoscRundy;
 					rozgrywka();
 					zakladki.show(panelGlowny, "ekranWynik");
 					ekranWynik.requestFocusInWindow();
@@ -93,44 +89,29 @@ public class Okno extends JFrame {
 						Thread.sleep(2000);
 					} catch (Exception ex) {
 					}
-					if(koniecGry)
+					if (koniecGry)
 						break;
 				}
 				zakladki.show(panelGlowny, "menuStart");
 				menuStart.requestFocusInWindow();
 			}
 		}
-
 	}
 
 	void rozgrywka() {
-
+		
 		for (int i = 0; i < 8; i++) {
-			kolory[i] = i+2;
-			pseudonimy[i] = new String("Gracz "+i);
-			parametryPrzedmiotow[i][0] = 0;
-			parametryPrzedmiotow[i][1] = 0;
+			kolory[i] = i + 2;
+			pseudonimy[i] = new String("Gracz " + i);
 		}
-		parametryPrzedmiotow[0][0] = 10;
-		parametryPrzedmiotow[0][1] = 50;
-//		parametryPrzedmiotow[1][0] = 100;
-//		parametryPrzedmiotow[1][1] = 1;
-		szerokoscMapy = 30;
-		wysokoscMapy = 14;
+		szerokoscMapy = 16;
+		wysokoscMapy = 8;
 
 		mapa = new int[wysokoscMapy][szerokoscMapy];
 		for (int i = 0; i < wysokoscMapy; i++)
 			for (int j = 0; j < szerokoscMapy; j++)
-				mapa[i][j] = random.nextInt(10);
-		ileGraczy = 8;
-		domyslnaSzybkosc = 10;
-		wlaczHP = true;
-		stalePrzenikanie = true;
-		staleOdbijanie = true;
-		stalePrzechodzenie = false;
-		zostawianieCiala = true;
-		dlugoscRundy = 3000;
-		pozostalyCzas = 3000;
+				mapa[i][j] = random.nextInt(10)+2;
+		ileGraczy = 4;
 
 		// ^^^ LOSOWE ^^^
 
@@ -142,25 +123,17 @@ public class Okno extends JFrame {
 
 		przedmiot.clear();
 		przedmiot.add(new Serek(this, parametryPrzedmiotow[0][0], parametryPrzedmiotow[0][1]));
-		przedmiot.add(new Duszek(this, parametryPrzedmiotow[1][0], parametryPrzedmiotow[1][1])); // nie moga sie
-																									// pojawiac jesli
-																									// przenikanie jest
-																									// stale
+		przedmiot.add(new Duszek(this, parametryPrzedmiotow[1][0], parametryPrzedmiotow[1][1]));
 		przedmiot.add(new Adrenalinka(this, parametryPrzedmiotow[2][0], parametryPrzedmiotow[2][1]));
 		przedmiot.add(new Slimaczek(this, parametryPrzedmiotow[3][0], parametryPrzedmiotow[3][1]));
-		przedmiot.add(new Odbijaczek(this, parametryPrzedmiotow[4][0], parametryPrzedmiotow[4][1])); // nie moga sie
-																										// pojawiac
-																										// jesli
-																										// odbijanie
-																										// jest stale
+		przedmiot.add(new Odbijaczek(this, parametryPrzedmiotow[4][0], parametryPrzedmiotow[4][1]));
 		przedmiot.add(new Nozyczki(this, parametryPrzedmiotow[5][0], parametryPrzedmiotow[5][1]));
-		przedmiot.add(new Apteczka(this, parametryPrzedmiotow[6][0], parametryPrzedmiotow[6][1])); // nie moga sie
-																									// pojawic jesli gra
-																									// bez hp
-		przedmiot.add(new Kolce(this, parametryPrzedmiotow[7][0], parametryPrzedmiotow[7][1])); // nie moga sie pojawic
-																								// jesli gra bez hp
+		przedmiot.add(new Apteczka(this, parametryPrzedmiotow[6][0], parametryPrzedmiotow[6][1]));
+		przedmiot.add(new Kolce(this, parametryPrzedmiotow[7][0], parametryPrzedmiotow[7][1]));
+		przedmiot.add(new Duszek2(this, parametryPrzedmiotow[8][0], parametryPrzedmiotow[8][1]));
+
 		rundaTrwa = true;
-		while (rundaTrwa&&!koniecGry) {
+		while (rundaTrwa && !koniecGry) {
 			try {
 				Thread.sleep(20);
 			} catch (InterruptedException e) {

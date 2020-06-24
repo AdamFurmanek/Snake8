@@ -160,9 +160,11 @@ public class Waz {
 		int x1 = 0, y1 = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0;
 		int ulozenieCiala = 0;
 		boolean zajete = true;
-
+		int proba=0;
+		
 		// SZUKANIE WOLNEGO MIEJSCA NA MAPIE
-		while (zajete) {
+		while (zajete&&proba<50) {
+			proba++;
 			// WYLOSOWANIE WSPOLRZEDNYCH GLOWKI WEZA
 			x1 = okno.random.nextInt(okno.szerokoscMapy);
 			y1 = okno.random.nextInt(okno.wysokoscMapy);
@@ -242,6 +244,7 @@ public class Waz {
 	}
 
 	void smierc() {
+		System.out.println(okno.limitZgonow);
 		hp = 0;
 		zgony++;
 		if(okno.limitZgonow>zgony||okno.limitZgonow==0) {
@@ -254,6 +257,10 @@ public class Waz {
 
 	// SPRAWDZENIE KOLIZJI WYWOLANE PRZEZ OBCEGO WEZA
 	boolean kolizja(Waz waz) {
+		
+		//JESLI WAZ NIE MA CIALA
+		if(cialo.size()==0)
+			return false;
 
 		// JESLI ZDERZYL SIE Z GLOWA
 		

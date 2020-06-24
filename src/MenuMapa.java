@@ -54,6 +54,7 @@ public class MenuMapa extends Ekran {
 		
 		// RYSOWANIE TLA
 		new ImageIcon("images/g/2.png").paintIcon(this, g2d, 0, 0);
+		new ImageIcon("images/g/c.png").paintIcon(this, g2d, 0, 0);
 		
 		// RYSOWANIE PRZYCISKU GRAJ
 		if(klawisz==1) {
